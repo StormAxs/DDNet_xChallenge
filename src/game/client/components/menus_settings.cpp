@@ -2005,6 +2005,11 @@ void CMenus::RenderSettings(CUIRect MainView)
 		GameClient()->m_MenuBackground.ChangePosition(CMenuBackground::POS_SETTINGS_ASSETS);
 		RenderSettingsCustom(MainView);
 	}
+	else if(g_Config.m_UiSettingsPage == SETTINGS_XC)
+	{
+		GameClient()->m_MenuBackground.ChangePosition(0);
+		RenderSettingsXChallange(MainView);
+	}
 	else
 	{
 		dbg_assert(false, "ui_settings_page invalid");

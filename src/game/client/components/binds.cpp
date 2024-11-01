@@ -263,6 +263,42 @@ void CBinds::SetDefaults()
 
 	Bind(KEY_F1, "toggle_local_console");
 	Bind(KEY_F2, "toggle_remote_console");
+	Bind(KEY_TAB, "+scoreboard");
+	Bind(KEY_EQUALS, "+statboard");
+	Bind(KEY_F10, "screenshot");
+
+	Bind(KEY_A, "+left");
+	Bind(KEY_D, "+right");
+
+	Bind(KEY_SPACE, "+jump");
+	Bind(KEY_MOUSE_1, "+fire");
+	Bind(KEY_MOUSE_2, "+hook");
+	Bind(KEY_LSHIFT, "+emote");
+	Bind(KEY_RETURN, "+show_chat; chat all");
+	Bind(KEY_RIGHT, "spectate_next");
+	Bind(KEY_LEFT, "spectate_previous");
+	Bind(KEY_RSHIFT, "+spectate");
+
+	Bind(KEY_1, "+weapon1");
+	Bind(KEY_2, "+weapon2");
+	Bind(KEY_3, "+weapon3");
+	Bind(KEY_4, "+weapon4");
+	Bind(KEY_5, "+weapon5");
+
+	Bind(KEY_MOUSE_WHEEL_UP, "+prevweapon");
+	Bind(KEY_MOUSE_WHEEL_DOWN, "+nextweapon");
+
+	Bind(KEY_T, "+show_chat; chat all");
+	Bind(KEY_Y, "+show_chat; chat team");
+	Bind(KEY_U, "+show_chat");
+	Bind(KEY_I, "+show_chat; chat all /c ");
+
+	Bind(KEY_F3, "vote yes");
+	Bind(KEY_F4, "vote no");
+
+	Bind(KEY_K, "kill");
+	Bind(KEY_Q, "say /spec");
+	Bind(KEY_P, "say /pause");
 
 	g_Config.m_ClDDRaceBindsSet = 0;
 	SetDDRaceBinds(false);

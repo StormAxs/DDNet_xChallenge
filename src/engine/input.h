@@ -20,15 +20,26 @@ class IInput : public IInterface
 {
 	MACRO_INTERFACE("input")
 public:
+	enum
+	{
+		INPUT_TEXT_SIZE = 32 * UTF8_BYTE_LENGTH + 1,
+	};
+
 	class CEvent
 	{
 	public:
 		int m_Flags;
 		int m_Key;
 		uint32_t m_InputCount;
-		char m_aText[32]; // SDL_TEXTINPUTEVENT_TEXT_SIZE
+		char m_aText[INPUT_TEXT_SIZE]; // SDL_TEXTINPUTEVENT_TEXT_SIZE
+	};
+protected:
+	enum
+	{
+		INPUT_BUFFER_SIZE = 32
 	};
 
+public:
 	enum
 	{
 		FLAG_PRESS = 1 << 0,
@@ -45,6 +56,11 @@ public:
 	// events
 	virtual void ConsumeEvents(std::function<void(const CEvent &Event)> Consumer) const = 0;
 	virtual void Clear() = 0;
+
+	int m_NumEvents;
+
+	size_t NumEvents() const { return m_NumEvents; }
+	bool IsEventValid(const CEvent &Event) const;
 
 	/**
 	 * @return Rolling average of the time in seconds between

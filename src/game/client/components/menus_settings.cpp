@@ -1,5 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include "menus_settings.h"
+
 #include <base/log.h>
 #include <base/math.h>
 #include <base/system.h>
@@ -867,14 +869,6 @@ void CMenus::RenderSettingsTee(CUIRect MainView)
 	TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
 }
 
-typedef struct
-{
-	const char *m_pName;
-	const char *m_pCommand;
-	int m_KeyId;
-	int m_ModifierCombination;
-} CKeyInfo;
-
 static CKeyInfo gs_aKeys[] =
 	{
 		{Localizable("Move left"), "+left", 0, 0},
@@ -928,7 +922,7 @@ static CKeyInfo gs_aKeys[] =
 		{Localizable("Show HUD"), "toggle cl_showhud 0 1", 0, 0},
 };
 
-void CMenus::DoSettingsControlsButtons(int Start, int Stop, CUIRect View)
+int CMenus::DoSettingsControlsButtons(int Start, int Stop, CUIRect View)
 {
 	for(int i = Start; i < Stop; i++)
 	{
@@ -936,7 +930,7 @@ void CMenus::DoSettingsControlsButtons(int Start, int Stop, CUIRect View)
 
 		CUIRect Button, Label;
 		View.HSplitTop(20.0f, &Button, &View);
-		Button.VSplitLeft(135.0f, &Label, &Button);
+		Button.VSplitMid(&Label, &Button);
 
 		char aBuf[64];
 		str_format(aBuf, sizeof(aBuf), "%s:", Localize(Key.m_pName));
@@ -954,6 +948,82 @@ void CMenus::DoSettingsControlsButtons(int Start, int Stop, CUIRect View)
 
 		View.HSplitTop(2.0f, 0, &View);
 	}
+
+	return 22.0f * (Stop - Start);
+}
+
+int CMenus::DoSettingsControlsButtons(const char *pGroupName, std::shared_ptr<IBindListNode> &pNode, CUIRect View)
+{
+	auto pBinds = m_pClient->m_BindsManager.Binds(pGroupName);
+	if(!pBinds)
+		return 0;
+
+	auto &&RenderKeyBind = [&](const std::shared_ptr<IBindListNode> &pLocalNode) -> int {
+		const auto Key = std::static_pointer_cast<SBindKey>(pLocalNode);
+		CUIRect Button, Label;
+		View.HSplitTop(20.0f, &Button, &View);
+		Button.VSplitMid(&Label, &Button);
+
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "%s:", Localize(Key->m_pName));
+
+		Ui()->DoLabel(&Label, aBuf, 13.0f, TEXTALIGN_ML);
+		int OldId = Key->m_KeyId, OldModifierCombination = Key->m_ModifierCombination, NewModifierCombination;
+		int NewId = DoKeyReader(&Key->m_KeyId, &Button, OldId, OldModifierCombination, &NewModifierCombination);
+		if(NewId != OldId || NewModifierCombination != OldModifierCombination)
+		{
+			if(OldId != 0 || NewId == 0)
+				pBinds->Bind(OldId, "", false, OldModifierCombination);
+			if(NewId != 0)
+				pBinds->Bind(NewId, Key->m_pCommand, false, NewModifierCombination);
+		}
+
+		View.HSplitTop(2.0f, 0, &View);
+		return 22.0f;
+	};
+
+	if(!pNode->IsGroup())
+	{
+		return RenderKeyBind(pNode);
+	}
+
+	const float FontSize = 14.0f;
+	const float Margin = 10.0f;
+	int TotalHeight = 0;
+
+	auto pGroup = std::static_pointer_cast<SBindGroup>(pNode);
+
+	for(const auto &Node : pGroup->m_vChildren)
+	{
+		if(Node->IsGroup())
+		{
+			View.HSplitTop(Margin / 2, nullptr, &View);
+			CUIRect GroupRect = View;
+			auto pChildGroup = std::static_pointer_cast<SBindGroup>(Node);
+			int Height = DoFoldableSection(&pChildGroup->m_Section, pChildGroup->m_pName, FontSize, &GroupRect, &View, 10.0f, [&]() -> int {
+				int LocalTotalHeight = 0;
+				GroupRect.HMargin(Margin, &GroupRect);
+				CUIRect ChildRect = GroupRect;
+				ChildRect.VMargin(Margin, &ChildRect);
+				for(auto &Child : pChildGroup->m_vChildren)
+				{
+					int LocalHeight = DoSettingsControlsButtons(pGroupName, Child, ChildRect);
+					ChildRect.y += LocalHeight;
+					LocalTotalHeight += LocalHeight;
+				}
+
+				return LocalTotalHeight + 2 * Margin;
+			});
+			View.HSplitTop(Margin / 2, nullptr, &View);
+			TotalHeight += Height + Margin;
+		}
+		else
+		{
+			TotalHeight += RenderKeyBind(Node);
+		}
+	}
+
+	return TotalHeight;
 }
 
 float CMenus::RenderSettingsControlsJoystick(CUIRect View)
@@ -1361,9 +1431,51 @@ void CMenus::RenderSettingsControls(CUIRect MainView)
 	s_ScrollRegion.End();
 }
 
+void CMenus::ResetKeys(std::shared_ptr<IBindListNode> &pNode)
+{
+	if(!pNode->IsGroup())
+	{
+		auto pKey = std::static_pointer_cast<SBindKey>(pNode);
+		pKey->m_KeyId = pKey->m_ModifierCombination = 0;
+		return;
+	}
+	auto pGroup = std::static_pointer_cast<SBindGroup>(pNode);
+	for(auto &pChild : pGroup->m_vChildren)
+	{
+		ResetKeys(pChild);
+	}
+}
+
+void CMenus::FindAndAssignKeys(std::shared_ptr<CBindsV2> &pBinds, int Mod, int KeyId, std::shared_ptr<IBindListNode> &pNode)
+{
+	if(!pNode->IsGroup())
+	{
+		auto pKey = std::static_pointer_cast<SBindKey>(pNode);
+		if(pKey->m_KeyId != 0)
+			return;
+
+		const char *pBind = pBinds->Get(KeyId, Mod);
+		if(!pBind[0])
+			return;
+
+		if(str_comp(pBind, pKey->m_pCommand) == 0)
+		{
+			pKey->m_KeyId = KeyId;
+			pKey->m_ModifierCombination = Mod;
+		}
+		return;
+	}
+	auto pGroup = std::static_pointer_cast<SBindGroup>(pNode);
+	for(auto &pChild : pGroup->m_vChildren)
+	{
+		FindAndAssignKeys(pBinds, Mod, KeyId, pChild);
+	}
+}
+
 void CMenus::ResetSettingsControls()
 {
 	m_pClient->m_Binds.SetDefaults();
+	m_pClient->m_BindsManager.SetDefaults();
 
 	g_Config.m_InpMousesens = 200;
 	g_Config.m_UiMousesens = 200;
@@ -1941,7 +2053,8 @@ void CMenus::RenderSettings(CUIRect MainView)
 		Localize("Graphics"),
 		Localize("Sound"),
 		Localize("DDNet"),
-		Localize("Assets")};
+		Localize("Assets"),
+		Localize("xChallange")};
 	static CButtonContainer s_aTabButtons[SETTINGS_LENGTH];
 
 	for(int i = 0; i < SETTINGS_LENGTH; i++)

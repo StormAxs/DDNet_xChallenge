@@ -23,6 +23,7 @@
 #include <game/generated/protocolglue.h>
 
 // components
+#include "binds_manager.h"
 #include "components/background.h"
 #include "components/binds.h"
 #include "components/broadcast.h"
@@ -131,6 +132,7 @@ public:
 	CBroadcast m_Broadcast;
 	CGameConsole m_GameConsole;
 	CBinds m_Binds;
+	CBindsManager m_BindsManager;
 	CParticles m_Particles;
 	CMenus m_Menus;
 	CSkins m_Skins;
@@ -170,6 +172,7 @@ public:
 private:
 	std::vector<class CComponent *> m_vpAll;
 	std::vector<class CComponent *> m_vpInput;
+	std::vector<class CComponent *> m_vpGlobal;
 	CNetObjHandler m_NetObjHandler;
 	protocol7::CNetObjHandler m_NetObjHandler7;
 
@@ -524,6 +527,7 @@ public:
 	void OnNewSnapshot() override;
 	void OnPredict() override;
 	void OnActivateEditor() override;
+	void OnHideEditor() override;
 	void OnDummySwap() override;
 	int OnSnapInput(int *pData, bool Dummy, bool Force) override;
 	void OnShutdown() override;
@@ -610,6 +614,9 @@ public:
 	bool CanDisplayWarning() const override;
 	CNetObjHandler *GetNetObjHandler() override;
 	protocol7::CNetObjHandler *GetNetObjHandler7() override;
+
+	void OnUpdateGlobalComponents() override;
+	void OnRenderGlobalComponents() override;
 
 	void LoadGameSkin(const char *pPath, bool AsDir = false);
 	void LoadEmoticonsSkin(const char *pPath, bool AsDir = false);

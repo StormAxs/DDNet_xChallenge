@@ -362,6 +362,7 @@ public:
 	virtual void OnMessage(int MsgId, CUnpacker *pUnpacker, int Conn, bool Dummy) = 0;
 	virtual void OnPredict() = 0;
 	virtual void OnActivateEditor() = 0;
+	virtual void OnHideEditor() = 0;
 	virtual void OnWindowResize() = 0;
 
 	virtual int OnSnapInput(int *pData, bool Dummy, bool Force) = 0;
@@ -384,6 +385,9 @@ public:
 
 	virtual CNetObjHandler *GetNetObjHandler() = 0;
 	virtual protocol7::CNetObjHandler *GetNetObjHandler7() = 0;
+
+	virtual void OnUpdateGlobalComponents() = 0;
+	virtual void OnRenderGlobalComponents() = 0;
 
 	virtual int ClientVersion7() const = 0;
 

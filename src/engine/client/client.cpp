@@ -2865,11 +2865,7 @@ void CClient::Update()
 
 	// update editor/gameclient
 	if(m_EditorActive)
-	{
 		m_pEditor->OnUpdate();
-		// Update global components of game client
-		GameClient()->OnUpdateGlobalComponents();
-	}
 	else
 		GameClient()->OnUpdate();
 
@@ -3171,7 +3167,6 @@ void CClient::Run()
 			else if(m_EditorActive)
 			{
 				m_EditorActive = false;
-				GameClient()->OnHideEditor();
 			}
 
 			Update();
@@ -3229,7 +3224,6 @@ void CClient::Run()
 				{
 					m_pEditor->OnRender();
 					DebugRender();
-					GameClient()->OnRenderGlobalComponents();
 				}
 				m_pGraphics->Swap();
 			}

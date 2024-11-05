@@ -116,8 +116,6 @@ void CGameClient::OnConsoleInit()
 					      &m_CountryFlags,
 					      &m_MapImages,
 					      &m_Effects, // doesn't render anything, just updates effects
-					      &m_BindsManager,
-					      &m_BindsManager.m_SpecialBinds,
 					      &m_Binds,
 					      &m_Binds.m_SpecialBinds,
 					      &m_Controls,
@@ -159,7 +157,6 @@ void CGameClient::OnConsoleInit()
 
 	// build the input stack
 	m_vpInput.insert(m_vpInput.end(), {&CMenus::m_Binder, // this will take over all input when we want to bind a key
-						  &m_BindsManager.m_SpecialBinds,
 						  &m_Binds.m_SpecialBinds,
 						  &m_GameConsole,
 						  &m_Chat, // chat has higher prio, due to that you can quit it by pressing esc
@@ -168,12 +165,9 @@ void CGameClient::OnConsoleInit()
 						  &m_Emoticon,
 						  &m_Menus,
 						  &m_Controls,
-						  &m_BindsManager,
 						  &m_Binds});
 
-	m_vpGlobal.insert(m_vpGlobal.end(), {&m_BindsManager.m_SpecialBinds, &m_BindsManager});
-
-	// add the some console commands
+	// add basic console commands
 	Console()->Register("team", "i[team-id]", CFGFLAG_CLIENT, ConTeam, this, "Switch team");
 	Console()->Register("kill", "", CFGFLAG_CLIENT, ConKill, this, "Kill yourself to restart");
 	Console()->Register("ready_change", "", CFGFLAG_CLIENT, ConReadyChange7, this, "Change ready state (0.7 only)");
@@ -402,55 +396,6 @@ void CGameClient::OnInit()
 			client_data7::g_pData->m_aImages[i].m_Id = Graphics()->LoadTexture(client_data7::g_pData->m_aImages[i].m_pFilename, IStorage::TYPE_ALL, 0);
 		m_Menus.RenderLoading(pLoadingDDNetCaption, Localize("Initializing assets"), 1);
 	}
-
-	for(auto &pComponent : m_vpAll)
-		pComponent->OnReset();
-
-	m_ServerMode = SERVERMODE_PURE;
-
-	m_aDDRaceMsgSent[0] = false;
-	m_aDDRaceMsgSent[1] = false;
-	m_aShowOthers[0] = SHOW_OTHERS_NOT_SET;
-	m_aShowOthers[1] = SHOW_OTHERS_NOT_SET;
-	m_aSwitchStateTeam[0] = -1;
-	m_aSwitchStateTeam[1] = -1;
-
-	m_LastZoom = .0;
-	m_LastScreenAspect = .0;
-	m_LastDummyConnected = false;
-
-	// Set free binds to DDRace binds if it's active
-	m_Binds.SetDDRaceBinds(true);
-	m_BindsManager.SetActiveBindGroup(CBindsManager::GROUP_MENUS);
-
-	if(g_Config.m_ClTimeoutCode[0] == '\0' || str_comp(g_Config.m_ClTimeoutCode, "hGuEYnfxicsXGwFq") == 0)
-	{
-		for(unsigned int i = 0; i < 16; i++)
-		{
-			if(rand() % 2)
-				g_Config.m_ClTimeoutCode[i] = (char)((rand() % 26) + 97);
-			else
-				g_Config.m_ClTimeoutCode[i] = (char)((rand() % 26) + 65);
-		}
-	}
-
-	if(g_Config.m_ClDummyTimeoutCode[0] == '\0' || str_comp(g_Config.m_ClDummyTimeoutCode, "hGuEYnfxicsXGwFq") == 0)
-	{
-		for(unsigned int i = 0; i < 16; i++)
-		{
-			if(rand() % 2)
-				g_Config.m_ClDummyTimeoutCode[i] = (char)((rand() % 26) + 97);
-			else
-				g_Config.m_ClDummyTimeoutCode[i] = (char)((rand() % 26) + 65);
-		}
-	}
-
-	int64_t End = time_get();
-	int64_t Start = time_get();
-
-	char aBuf[128];
-	str_format(aBuf, sizeof(aBuf), "initialisation finished after %.2fms", ((End - Start) * 1000) / (float)time_freq());
-	Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "gameclient", aBuf);
 
 	m_GameWorld.m_pCollision = Collision();
 	m_GameWorld.m_pTuningList = m_aTuningList;
@@ -715,7 +660,8 @@ void CGameClient::OnReset()
 	Editor()->ResetMentions();
 	Editor()->ResetIngameMoved();
 
-	m_BindsManager.SetActiveBindGroup(CBindsManager::GROUP_MENUS);
+	Collision()->Unload();
+	Layers()->Unload();
 }
 
 void CGameClient::UpdatePositions()
@@ -1155,8 +1101,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker, int Conn, bool Dumm
 				if(CCharacter *pChar = m_GameWorld.GetCharacterById(i))
 				{
 					pChar->ResetPrediction();
-					vStrongWeakSorted.emplace_back(i, pMsg->m_First == i ? MAX_CLIENTS : pChar ? pChar->GetStrongWeakId() :
-                                                                                                                     0);
+					vStrongWeakSorted.emplace_back(i, pMsg->m_First == i ? MAX_CLIENTS : pChar ? pChar->GetStrongWeakId() : 0);
 				}
 				m_GameWorld.ReleaseHooked(i);
 			}
@@ -1194,13 +1139,6 @@ void CGameClient::OnStateChange(int NewState, int OldState)
 	// then change the state
 	for(auto &pComponent : m_vpAll)
 		pComponent->OnStateChange(NewState, OldState);
-
-	if(NewState == IClient::STATE_DEMOPLAYBACK)
-		m_BindsManager.SetActiveBindGroup(CBindsManager::GROUP_DEMO_PLAYER);
-	else if(NewState == IClient::STATE_ONLINE)
-		m_BindsManager.SetActiveBindGroup(CBindsManager::GROUP_INGAME);
-	else if(NewState == IClient::STATE_OFFLINE)
-		m_BindsManager.SetActiveBindGroup(CBindsManager::GROUP_MENUS);
 }
 
 void CGameClient::OnShutdown()
@@ -2451,22 +2389,6 @@ void CGameClient::OnPredict()
 void CGameClient::OnActivateEditor()
 {
 	OnRelease();
-	m_BindsManager.SetActiveBindGroup(CBindsManager::GROUP_EDITOR);
-}
-
-void CGameClient::OnHideEditor()
-{
-	if(Client()->State() == IClient::STATE_ONLINE)
-	{
-		if(m_Menus.IsActive())
-			m_BindsManager.SetActiveBindGroup(CBindsManager::GROUP_MENUS);
-		else
-			m_BindsManager.SetActiveBindGroup(CBindsManager::GROUP_INGAME);
-	}
-	else
-	{
-		m_BindsManager.SetActiveBindGroup(CBindsManager::GROUP_MENUS);
-	}
 }
 
 CGameClient::CClientStats::CClientStats()
@@ -3864,20 +3786,6 @@ void CGameClient::RefreshSkins()
 
 	for(auto &pComponent : m_vpAll)
 		pComponent->OnRefreshSkins();
-}
-
-void CGameClient::OnUpdateGlobalComponents()
-{
-	// handle key presses
-	//empty;p
-}
-
-void CGameClient::OnRenderGlobalComponents()
-{
-	for(auto &pComponent : m_vpGlobal)
-	{
-		pComponent->OnRender();
-	}
 }
 
 void CGameClient::ConchainRefreshSkins(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)

@@ -35,18 +35,6 @@ struct CServerProcess
 	PROCESS m_Process;
 };
 
-struct SFoldableSection
-{
-	bool m_Opened = false;
-	int m_Height = 0;
-};
-
-struct IBindListNode;
-struct SBindGroup;
-struct SBindKey;
-class CBindsV2;
-class CScrollRegion;
-
 // component to fetch keypresses, override all other input
 class CMenusKeyBinder : public CComponent
 {
@@ -60,14 +48,6 @@ public:
 	virtual int Sizeof() const override { return sizeof(*this); }
 	virtual bool OnInput(const IInput::CEvent &Event) override;
 };
-
-typedef struct
-{
-	const char *m_pName;
-	const char *m_pCommand;
-	int m_KeyId;
-	int m_ModifierCombination;
-} CKeyInfo;
 
 struct SCommunityIcon
 {
@@ -100,10 +80,7 @@ class CMenus : public CComponent
 	int DoButton_CheckBoxAutoVMarginAndSet(const void *pId, const char *pText, int *pValue, CUIRect *pRect, float VMargin);
 	int DoButton_CheckBox_Number(const void *pId, const char *pText, int Checked, const CUIRect *pRect);
 
-	int DoButton_FoldableSection(SFoldableSection *pSection, const char *pText, float FontSize, const CUIRect *pRect, float CornerRounding = 0.f);
-	int DoFoldableSection(SFoldableSection *pSection, const char *pText, float FontSize, CUIRect *pRect, CUIRect *pRectAfter, float CornerRounding, const std::function<int()> &fnRender);
-
-	ColorHSLA DoLine_ColorPicker(CButtonContainer *pResetID, float LineSize, float LabelSize, float BottomMargin, CUIRect *pMainRect, const char *pText, unsigned int *pColorValue, ColorRGBA DefaultColor, bool CheckBoxSpacing = true, int *pCheckBoxValue = nullptr, bool Alpha = false);
+	ColorHSLA DoLine_ColorPicker(CButtonContainer *pResetId, float LineSize, float LabelSize, float BottomMargin, CUIRect *pMainRect, const char *pText, unsigned int *pColorValue, ColorRGBA DefaultColor, bool CheckBoxSpacing = true, int *pCheckBoxValue = nullptr, bool Alpha = false);
 	ColorHSLA DoButton_ColorPicker(const CUIRect *pRect, unsigned int *pHslaColor, bool Alpha);
 	void DoLaserPreview(const CUIRect *pRect, ColorHSLA OutlineColor, ColorHSLA InnerColor, const int LaserType);
 	int DoButton_GridHeader(const void *pId, const char *pText, int Checked, const CUIRect *pRect);
@@ -111,8 +88,7 @@ class CMenus : public CComponent
 
 	int DoKeyReader(const void *pId, const CUIRect *pRect, int Key, int ModifierCombination, int *pNewModifierCombination);
 
-	int DoSettingsControlsButtons(int Start, int Stop, CUIRect View);
-	int DoSettingsControlsButtons(const char *pGroupName, std::shared_ptr<IBindListNode> &pNode, CUIRect View);
+	void DoSettingsControlsButtons(int Start, int Stop, CUIRect View);
 
 	float RenderSettingsControlsJoystick(CUIRect View);
 	void DoJoystickAxisPicker(CUIRect View);
@@ -633,8 +609,6 @@ protected:
 	void RenderSettingsSound(CUIRect MainView);
 	void RenderSettings(CUIRect MainView);
 	void RenderSettingsCustom(CUIRect MainView);
-	void FindAndAssignKeys(std::shared_ptr<CBindsV2> &pBinds, int Mod, int KeyId, std::shared_ptr<IBindListNode> &pNode);
-	void ResetKeys(std::shared_ptr<IBindListNode> &pNode);
 	void RenderSettingsXChallange(CUIRect MainView);
 
 	class CMapListItem
@@ -681,22 +655,13 @@ public:
 	static CMenusKeyBinder m_Binder;
 
 	CMenus();
-	virtual int Sizeof() const override
-	{
-		return sizeof(*this);
-	}
+	virtual int Sizeof() const override { return sizeof(*this); }
 
 	void RenderLoading(const char *pCaption, const char *pContent, int IncreaseCounter, bool RenderLoadingBar = true, bool RenderMenuBackgroundMap = true);
 
-	bool IsInit()
-	{
-		return m_IsInit;
-	}
+	bool IsInit() { return m_IsInit; }
 
-	bool IsActive() const
-	{
-		return m_MenuActive;
-	}
+	bool IsActive() const { return m_MenuActive; }
 	void KillServer();
 
 	virtual void OnInit() override;
@@ -786,10 +751,7 @@ public:
 	void DemoSeekTick(IDemoPlayer::ETickOffset TickOffset);
 	bool m_Dummy;
 
-	const char *GetCurrentDemoFolder() const
-	{
-		return m_aCurrentDemoFolder;
-	}
+	const char *GetCurrentDemoFolder() const { return m_aCurrentDemoFolder; }
 
 	// Ghost
 	struct CGhostItem
@@ -830,10 +792,6 @@ public:
 	void DeleteGhostItem(int Index);
 	void SortGhostlist();
 
-	int GetCurPopup()
-	{
-		return m_Popup;
-	}
 	bool CanDisplayWarning() const;
 
 	void PopupWarning(const char *pTopic, const char *pBody, const char *pButton, std::chrono::nanoseconds Duration);

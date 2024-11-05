@@ -2338,6 +2338,7 @@ if(CLIENT)
     components/chat.cpp
     components/chat.h
     components/console.cpp
+   # components/xchallange/console_flex.cpp
     components/console.h
     components/controls.cpp
     components/controls.h

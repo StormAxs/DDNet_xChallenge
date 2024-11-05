@@ -61,7 +61,7 @@ void CMenus::RenderSettingsXChallange(CUIRect MainView)
     const float ColorPickerLabelSize = 13.0f;
     const float ColorPickerLineSpacing = 5.0f;
 
-    CUIRect GeneralGroup;
+    CUIRect GeneralGroup, ConsoleGroup;
     MainView.y -= 10.0f;
 
     // Begining of the section
@@ -84,5 +84,87 @@ void CMenus::RenderSettingsXChallange(CUIRect MainView)
     });
     s_ScrollRegion.AddRect(GeneralGroup);
     //Section:end
+
+
+    // Begining of the section
+    static SFoldableSection s_InConsoleGroup;
+    MainView.HSplitTop(Margin, nullptr, &ConsoleGroup);
+    DoFoldableSection(&s_InConsoleGroup, Localize("Console"), FontSize, &ConsoleGroup, &MainView, 5.0f, [&]() -> int {
+        ConsoleGroup.VMargin(Margin, &ConsoleGroup);
+        ConsoleGroup.HMargin(Margin, &ConsoleGroup);
+
+        int TotalHeight = 75.0f; // section height
+
+        // Code stuff
+        CUIRect Button;
+
+        ConsoleGroup.HSplitTop(LineSize, &Button, &ConsoleGroup);
+        if(DoButton_CheckBox(&g_Config.m_XcCustomConsole, Localize("Enable custom console"), g_Config.m_XcCustomConsole, &Button))
+         {
+             g_Config.m_XcCustomConsole ^= 1;
+         }
+
+        ConsoleGroup.HSplitTop(LineSize, &Button, &ConsoleGroup);
+        if(DoButton_CheckBox(&g_Config.m_XcCustomConsoleBar, Localize("Enable custom console bar"), g_Config.m_XcCustomConsoleBar, &Button))
+            {
+               g_Config.m_XcCustomConsoleBar ^= 1;
+            }
+
+        ConsoleGroup.HSplitTop(LineSize, &Button, &ConsoleGroup);
+        if(DoButton_CheckBox(&g_Config.m_XcConsoleAnimation, Localize("Enable custom console speed"), g_Config.m_XcConsoleAnimation, &Button))
+        {
+           g_Config.m_XcConsoleAnimation ^= 1;
+        }
+
+
+        int i = 0;
+          static CButtonContainer s_aResetIDs[24];
+        if(g_Config.m_XcCustomConsole) {
+            DoLine_ColorPicker(&s_aResetIDs[i++],
+                    ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
+                    &ConsoleGroup, Localize("Local console color"),
+                    &g_Config.m_XcLocalConsoleColor,
+                    ColorRGBA(0.2f, 0.2f, 0.2f),
+                    false);
+
+            DoLine_ColorPicker(&s_aResetIDs[i++],
+                    ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
+                    &ConsoleGroup, Localize("Remote console color"),
+                    &g_Config.m_XcRemoteConsoleColor,
+                    ColorRGBA(0.4f, 0.2f, 0.2f),
+                    false);
+
+            TotalHeight += 100.0f;
+        }
+        if(g_Config.m_XcCustomConsoleBar) {
+            DoLine_ColorPicker(&s_aResetIDs[i++],
+                          ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing,
+                          &ConsoleGroup, Localize("Console bar color"),
+                          &g_Config.m_XcConsoleBarColor,
+                          ColorRGBA(8883654),
+                          false);
+
+            TotalHeight += 20.0f;
+        }
+        if(g_Config.m_XcCustomConsole) {
+            ConsoleGroup.HSplitTop(20.f, &Button, &ConsoleGroup);
+            Ui()->DoScrollbarOption(&g_Config.m_XcLocalConsoleAlpha, &g_Config.m_XcLocalConsoleAlpha, &Button, Localize("Local Console Opacity"), 0, 100, &CUi::ms_LinearScrollbarScale, 0u, "%");
+            //rcon
+            ConsoleGroup.HSplitTop(20.f, &Button, &ConsoleGroup);
+            Ui()->DoScrollbarOption(&g_Config.m_XcRemoteConsoleAlpha, &g_Config.m_XcRemoteConsoleAlpha, &Button, Localize("Remote Console Opacity"), 0, 100, &CUi::ms_LinearScrollbarScale, 0u, "%");
+        }
+        if(g_Config.m_XcConsoleAnimation) {
+            ConsoleGroup.HSplitTop(20.f, &Button, &ConsoleGroup);
+            Ui()->DoScrollbarOption(&g_Config.m_XcConsoleAnimationSpeed, &g_Config.m_XcConsoleAnimationSpeed, &Button, Localize("Console opening speed"), 5, 0, &CUi::ms_LinearScrollbarScale, 0u, "");
+
+            TotalHeight += 30.0f;
+        }
+        // Done with code
+        return TotalHeight + Margin;
+    });
+    s_ScrollRegion.AddRect(ConsoleGroup);
+    //Section:end
+
+
     s_ScrollRegion.End();
 }

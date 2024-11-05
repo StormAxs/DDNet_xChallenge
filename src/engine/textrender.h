@@ -102,6 +102,7 @@ MAYBE_UNUSED static const char *FONT_ICON_STOP = "\xEF\x81\x8D";
 MAYBE_UNUSED static const char *FONT_ICON_CHEVRON_LEFT = "\xEF\x81\x93";
 MAYBE_UNUSED static const char *FONT_ICON_CHEVRON_RIGHT = "\xEF\x81\x94";
 MAYBE_UNUSED static const char *FONT_ICON_CHEVRON_UP = "\xEF\x81\xB7";
+	MAYBE_UNUSED static const char *FONT_ICON_CIRCLE_CHEVRON_RIGHT = "\xEF\x84\xB8"; //Xc
 MAYBE_UNUSED static const char *FONT_ICON_CHEVRON_DOWN = "\xEF\x81\xB8";
 MAYBE_UNUSED static const char *FONT_ICON_BACKWARD = "\xEF\x81\x8A";
 MAYBE_UNUSED static const char *FONT_ICON_FORWARD = "\xEF\x81\x8E";

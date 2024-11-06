@@ -168,3 +168,18 @@ void CMenus::RenderSettingsXChallange(CUIRect MainView)
 
     s_ScrollRegion.End();
 }
+
+/*
+		CUIRect DirectoryButton;
+		Left.HSplitBottom(20.0f, &Left, &DirectoryButton);
+		Left.HSplitBottom(5.0f, &Left, nullptr);
+		static CButtonContainer s_ThemesButtonId;
+		if(DoButton_Menu(&s_ThemesButtonId, Localize("Themes directory"), 0, &DirectoryButton))
+		{
+			Storage()->GetCompletePath(IStorage::TYPE_SAVE, "themes", aBuf, sizeof(aBuf));
+			Storage()->CreateFolder("themes", IStorage::TYPE_SAVE);
+			Client()->ViewFile(aBuf);
+		}
+		GameClient()->m_Tooltips.DoToolTip(&s_ThemesButtonId, &DirectoryButton, Localize("Open the directory to add custom themes"));
+	
+ */

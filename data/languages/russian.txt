@@ -1960,32 +1960,32 @@ Eyes
 == Глаза
 
 Enable .png support for console
-==
+== Включить поддержку фото в консоли
 
 Enable custom console
-==
+== Включить пользовательскую консоль
 
 Enable custom console bar
-==
+== Вкулючить пользовательскую полосу в консоли
 
 Enable custom console speed
-==
+== Включить скорость анимации консоли
 
 Local console color
-==
+== Цвет локальной консоли
 
 Remote console color
-==
+== Цвет удаленной консоли(rcon)
 
 Console bar color
-==
+== Цвет цвет полосы консоли
 
 Local Console Opacity
-==
+== Прозрачной локальной консоли
 
 Remote Console Opacity
-==
+== Прозрачность удаленной консоли(rcon)
 
 Console opening speed
-==
+== Скорость анимации консоли
 

@@ -823,6 +823,7 @@ set(DEP_STB_IMAGE_SRC src/engine/external/stb_image/stb_image_impl.cpp)
 # Create an object library for stb_image
 add_library(stb_image EXCLUDE_FROM_ALL OBJECT ${DEP_STB_IMAGE_SRC})
 set_target_properties(stb_image PROPERTIES LINKER_LANGUAGE CXX)
+##xC support
 
 set_src(DEP_JSON_SRC GLOB src/engine/external/json-parser json.c json.h)
 add_library(json EXCLUDE_FROM_ALL OBJECT ${DEP_JSON_SRC})

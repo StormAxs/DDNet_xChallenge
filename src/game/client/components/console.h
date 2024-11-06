@@ -111,9 +111,6 @@ class CGameConsole : public CComponent
 		bool OnInput(const IInput::CEvent &Event);
 		void PrintLine(const char *pLine, int Len, ColorRGBA PrintColor) REQUIRES(!m_BacklogPendingLock);
 		int GetLinesToScroll(int Direction, int LinesToScroll);
-
-
-		int LoadPNGTexture(const char *pFilePath);
 		void ScrollToCenter(int StartLine, int EndLine);
 		void ClearSearch();
 		void Dump() REQUIRES(!m_BacklogPendingLock);
@@ -187,6 +184,8 @@ public:
 
 	void PrintLine(int Type, const char *pLine);
 	void RequireUsername(bool UsernameReq);
+
+	void RenderCustomConsoleBar(const char* aPath);
 
 	virtual void OnStateChange(int NewState, int OldState) override;
 	virtual void OnConsoleInit() override;

@@ -1,5 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#define STB_IMAGE_IMPLEMENTATION
+#include <engine/external/stb_image/stb_image.h>
+#include <GL/glew.h>
 
 #include <base/lock.h>
 #include <base/logger.h>
@@ -991,7 +994,7 @@ void CGameConsole::OnRender()
 	CUIRect Screen = *Ui()->Screen();
 	CInstance *pConsole = CurrentConsole();
 //Anim speed
-	const float MaxConsoleHeight = Screen.h * 3 / 5.0f;
+	const float MaxConsoleHeight = Screen.h * 3.5 / 5.0f;
 	float Progress;
 	if(g_Config.m_XcConsoleAnimation) {
 		Progress = (Client()->GlobalTime() - (m_StateChangeEnd - m_StateChangeDuration)) / m_StateChangeDuration / g_Config.m_XcConsoleAnimationSpeed;
@@ -1044,21 +1047,53 @@ void CGameConsole::OnRender()
 
 	ColorRGBA XcConsoleBarColor = color_cast<ColorRGBA, ColorHSVA>(ColorHSVA(g_Config.m_XcConsoleBarColor));
 
-	// do console shadow
-	Graphics()->TextureClear();
-	Graphics()->QuadsBegin();
-	IGraphics::CColorVertex Array[4] = {
-		IGraphics::CColorVertex(0, 0, 0, 0, 0.5f),
-		IGraphics::CColorVertex(1, 0, 0, 0, 0.5f),
-		IGraphics::CColorVertex(2, 0, 0, 0, 0.0f),
-		IGraphics::CColorVertex(3, 0, 0, 0, 0.0f)};
-	Graphics()->SetColorVertex(Array, 4);
-	IGraphics::CQuadItem QuadItem(0, ConsoleHeight, Screen.w, 10.0f);
-	Graphics()->QuadsDrawTL(&QuadItem, 1);
-	Graphics()->QuadsEnd();
+	float BRTH = g_Config.m_XcCustomConsoleBrightness;
+	float ALPH = g_Config.m_XcLocalConsoleAlpha;;
+	ColorRGBA XcCustomConsoleBrightness = color_cast<ColorRGBA, ColorHSVA>(ColorHSVA(0, 0, BRTH / 100, ALPH / 100));
 
-	// do background (ddnet)
-	if(g_Config.m_XcCustomConsole) {
+	//TODO:Remade shadows
+
+	IGraphics::CQuadItem QuadItem(0, ConsoleHeight, Screen.w, 10.0f);\
+
+
+	// do background (ddmet)
+	if(g_Config.m_XcCustomConIcons) {
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_CONSOLE_ICON].m_Id);
+		Graphics()->QuadsBegin();
+		Graphics()->SetColor(XcCustomConsoleBrightness);
+
+//GPT my beloved
+		// Get the actual texture's width and height from the texture handle
+		float textureWidth = 1920;
+		float textureHeight = 1080;
+
+		// Scale the texture to fit the screen width (maintaining aspect ratio)
+		float scaleFactor = Screen.w / textureWidth;
+		float scaledWidth = textureWidth * scaleFactor;
+		float scaledHeight = textureHeight * scaleFactor;
+
+
+
+		// Position the image such that its bottom is aligned with the bottom of the console
+		float xOffset = (Screen.w - scaledWidth) / 2.0f;  // Horizontal centering
+		float yOffset = ConsoleHeight - scaledHeight;  // Bottom-aligned position
+
+		// If the image height is greater than ConsoleHeight, move it upwards
+		if (scaledHeight > ConsoleHeight) {
+			yOffset = -scaledHeight + ConsoleHeight;  // Move it upwards, but bottom sticks
+		}
+
+		// Set texture coordinates for the entire texture (full image)
+		Graphics()->QuadsSetSubset(0, 0, 1, 1);
+
+		// Create a quad item with the calculated dimensions and offsets
+		IGraphics::CQuadItem QuadItem(xOffset, yOffset, scaledWidth, scaledHeight);
+		Graphics()->QuadsDrawTL(&QuadItem, 1);
+
+		Graphics()->QuadsEnd();
+
+	}
+	else if(g_Config.m_XcCustomConsole) {
 
 		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_NULL].m_Id);
 		Graphics()->QuadsBegin();
@@ -1082,18 +1117,7 @@ void CGameConsole::OnRender()
 		Graphics()->QuadsDrawTL(&QuadItem, 1);
 		Graphics()->QuadsEnd();
 	}
-	// do small bar shadow
-	Graphics()->TextureClear();
-	Graphics()->QuadsBegin();
-	Array[0] = IGraphics::CColorVertex(0, 0, 0, 0, 0.0f);
-	Array[1] = IGraphics::CColorVertex(1, 0, 0, 0, 0.0f);
-	Array[2] = IGraphics::CColorVertex(2, 0, 0, 0, 0.25f);
-	Array[3] = IGraphics::CColorVertex(3, 0, 0, 0, 0.25f);
 
-	Graphics()->SetColorVertex(Array, 4);
-	QuadItem = IGraphics::CQuadItem(0, ConsoleHeight - 20, Screen.w, 10);
-	Graphics()->QuadsDrawTL(&QuadItem, 1);
-	Graphics()->QuadsEnd();
 	if(g_Config.m_XcCustomConsoleBar) {
 		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_NULL].m_Id);
 		Graphics()->QuadsBegin();

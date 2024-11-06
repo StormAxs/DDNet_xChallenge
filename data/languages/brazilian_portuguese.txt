@@ -1976,32 +1976,32 @@ Some fonts could not be loaded. Check the local console for details.
 == Algumas fontes não puderam ser carregadas. Verifique o console local para detalhes.
 
 Enable .png support for console
-==
+== Habilitar suporte de .png para o console
 
 Enable custom console
-==
+== Habilitar console customizável
 
 Enable custom console bar
-==
+== Habilitar barra customizável do console
 
 Enable custom console speed
-==
+== Habilitar velocidade customizável do console
 
 Local console color
-==
+== Cor do console local
 
 Remote console color
-==
+== Cor do console remoto
 
 Console bar color
-==
+== Cor da barra do console
 
 Local Console Opacity
-==
+== Opacidade do console local
 
 Remote Console Opacity
-==
+== Opacidade do console remoto
 
 Console opening speed
-==
+== Velocidade de abertura do console
 

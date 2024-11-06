@@ -93,16 +93,47 @@ void CMenus::RenderSettingsXChallange(CUIRect MainView)
         ConsoleGroup.VMargin(Margin, &ConsoleGroup);
         ConsoleGroup.HMargin(Margin, &ConsoleGroup);
 
-        int TotalHeight = 75.0f; // section height
+        int TotalHeight = 100.0f; // section height
 
         // Code stuff
         CUIRect Button;
 
+
         ConsoleGroup.HSplitTop(LineSize, &Button, &ConsoleGroup);
-        if(DoButton_CheckBox(&g_Config.m_XcCustomConsole, Localize("Enable custom console"), g_Config.m_XcCustomConsole, &Button))
-         {
-             g_Config.m_XcCustomConsole ^= 1;
-         }
+        if(g_Config.m_XcCustomConsole) {
+            TextRender()->TextColor(1,1,1,0.6);
+
+            if(DoButton_CheckBox(&g_Config.m_XcCustomConIcons, Localize("Enable .png support for console"), g_Config.m_XcCustomConIcons, &Button))
+            {
+                 g_Config.m_XcCustomConIcons ^= 1;
+                 g_Config.m_XcCustomConsole = 0;
+            }
+
+            TextRender()->TextColor(1,1,1,1);
+        }
+        else if(DoButton_CheckBox(&g_Config.m_XcCustomConIcons, Localize("Enable .png support for console"), g_Config.m_XcCustomConIcons, &Button))
+        {
+             g_Config.m_XcCustomConIcons ^= 1;
+             g_Config.m_XcCustomConsole = 0;
+        }
+        ConsoleGroup.HSplitTop(LineSize, &Button, &ConsoleGroup);
+
+        if(g_Config.m_XcCustomConIcons) {
+            TextRender()->TextColor(1,1,1,0.6);
+
+             if(DoButton_CheckBox(&g_Config.m_XcCustomConsole, Localize("Enable custom console"), g_Config.m_XcCustomConsole, &Button))
+             {
+                 g_Config.m_XcCustomConsole ^= 1;
+                 g_Config.m_XcCustomConIcons = 0;
+             }
+
+            TextRender()->TextColor(1,1,1,1);
+        }
+        else if(DoButton_CheckBox(&g_Config.m_XcCustomConsole, Localize("Enable custom console"), g_Config.m_XcCustomConsole, &Button))
+            {
+                g_Config.m_XcCustomConsole ^= 1;
+                g_Config.m_XcCustomConIcons = 0;
+            }
 
         ConsoleGroup.HSplitTop(LineSize, &Button, &ConsoleGroup);
         if(DoButton_CheckBox(&g_Config.m_XcCustomConsoleBar, Localize("Enable custom console bar"), g_Config.m_XcCustomConsoleBar, &Button))
@@ -146,8 +177,14 @@ void CMenus::RenderSettingsXChallange(CUIRect MainView)
 
             TotalHeight += 20.0f;
         }
+
+        ConsoleGroup.HSplitTop(20.f, &Button, &ConsoleGroup);
+
+        if(g_Config.m_XcCustomConIcons) {
+            Ui()->DoScrollbarOption(&g_Config.m_XcLocalConsoleAlpha, &g_Config.m_XcLocalConsoleAlpha, &Button, Localize("Local Console Opacity"), 0, 100, &CUi::ms_LinearScrollbarScale, 0u, "%");
+            TotalHeight += 10;
+        }
         if(g_Config.m_XcCustomConsole) {
-            ConsoleGroup.HSplitTop(20.f, &Button, &ConsoleGroup);
             Ui()->DoScrollbarOption(&g_Config.m_XcLocalConsoleAlpha, &g_Config.m_XcLocalConsoleAlpha, &Button, Localize("Local Console Opacity"), 0, 100, &CUi::ms_LinearScrollbarScale, 0u, "%");
             //rcon
             ConsoleGroup.HSplitTop(20.f, &Button, &ConsoleGroup);

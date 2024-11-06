@@ -1958,3 +1958,34 @@ Feet
 [skins]
 Eyes
 == Глаза
+
+Enable .png support for console
+==
+
+Enable custom console
+==
+
+Enable custom console bar
+==
+
+Enable custom console speed
+==
+
+Local console color
+==
+
+Remote console color
+==
+
+Console bar color
+==
+
+Local Console Opacity
+==
+
+Remote Console Opacity
+==
+
+Console opening speed
+==
+

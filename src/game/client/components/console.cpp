@@ -1063,34 +1063,35 @@ void CGameConsole::OnRender()
 		Graphics()->SetColor(XcCustomConsoleBrightness);
 
 //GPT my beloved
-		// Get the actual texture's width and height from the texture handle
-		float textureWidth = 1920;
-		float textureHeight = 1080;
 
-		// Scale the texture to fit the screen width (maintaining aspect ratio)
-		float scaleFactor = Screen.w / textureWidth;
-		float scaledWidth = textureWidth * scaleFactor;
-		float scaledHeight = textureHeight * scaleFactor;
+		float TextureWidth;
+		float TextureHeight	;
+		if(g_Config.m_XcWallpaperConsoleScaling) {
+			TextureHeight = g_Config.m_XcWallpaperConsoleScalingH;
+			TextureWidth = g_Config.m_XcWallpaperConsoleScalingW;
+		}
+		else { //use default
+			TextureWidth = 1920; //! Your screen width
+			TextureHeight = 760; //! Your Screen height devided by / 3 + 50	(1080 / 3 + 50)
+		}
 
+		//Scaling formula
+		float scaleFactor = Screen.w / TextureWidth;
+		float scaledWidth = TextureWidth * scaleFactor;
+		float scaledHeight = TextureHeight * scaleFactor;
 
-
-		// Position the image such that its bottom is aligned with the bottom of the console
 		float xOffset = (Screen.w - scaledWidth) / 2.0f;  // Horizontal centering
 		float yOffset = ConsoleHeight - scaledHeight;  // Bottom-aligned position
 
-		// If the image height is greater than ConsoleHeight, move it upwards
 		if (scaledHeight > ConsoleHeight) {
 			yOffset = -scaledHeight + ConsoleHeight;  // Move it upwards, but bottom sticks
 		}
-
-		// Set texture coordinates for the entire texture (full image)
 		Graphics()->QuadsSetSubset(0, 0, 1, 1);
-
-		// Create a quad item with the calculated dimensions and offsets
+		//finish drawing
 		IGraphics::CQuadItem QuadItem(xOffset, yOffset, scaledWidth, scaledHeight);
 		Graphics()->QuadsDrawTL(&QuadItem, 1);
-
 		Graphics()->QuadsEnd();
+
 
 	}
 	else if(g_Config.m_XcCustomConsole) {

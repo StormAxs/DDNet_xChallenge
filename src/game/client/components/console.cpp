@@ -1076,23 +1076,21 @@ void CGameConsole::OnRender()
 		}
 
 		//Scaling formula
-		float scaleFactor = Screen.w / TextureWidth;
-		float scaledWidth = TextureWidth * scaleFactor;
-		float scaledHeight = TextureHeight * scaleFactor;
+		float ScaleFactor = Screen.w / TextureWidth;
+		float ScaledWidth = TextureWidth * ScaleFactor;
+		float ScaledHeight = TextureHeight * ScaleFactor;
 
-		float xOffset = (Screen.w - scaledWidth) / 2.0f;  // Horizontal centering
-		float yOffset = ConsoleHeight - scaledHeight;  // Bottom-aligned position
+		float xOffset = (Screen.w - ScaledWidth) / 2.0f;  // Horizontal centering
+		float yOffset = ConsoleHeight - ScaledHeight;  // Bottom-aligned position
 
-		if (scaledHeight > ConsoleHeight) {
-			yOffset = -scaledHeight + ConsoleHeight;  // Move it upwards, but bottom sticks
+		if (ScaledHeight > ConsoleHeight) {
+			yOffset = -ScaledHeight + ConsoleHeight;  // Move it upwards, but bottom sticks
 		}
 		Graphics()->QuadsSetSubset(0, 0, 1, 1);
 		//finish drawing
-		IGraphics::CQuadItem QuadItem(xOffset, yOffset, scaledWidth, scaledHeight);
+		IGraphics::CQuadItem QuadItem(xOffset, yOffset, ScaledWidth, ScaledHeight);
 		Graphics()->QuadsDrawTL(&QuadItem, 1);
 		Graphics()->QuadsEnd();
-
-
 	}
 	else if(g_Config.m_XcCustomConsole) {
 

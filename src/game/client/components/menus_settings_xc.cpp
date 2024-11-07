@@ -182,7 +182,10 @@ void CMenus::RenderSettingsXChallange(CUIRect MainView)
 
         if(g_Config.m_XcCustomConIcons) {
             Ui()->DoScrollbarOption(&g_Config.m_XcLocalConsoleAlpha, &g_Config.m_XcLocalConsoleAlpha, &Button, Localize("Local Console Opacity"), 0, 100, &CUi::ms_LinearScrollbarScale, 0u, "%");
-            TotalHeight += 10;
+            ConsoleGroup.HSplitTop(20.f, &Button, &ConsoleGroup);
+            Ui()->DoScrollbarOption(&g_Config.m_XcCustomConsoleBrightness, &g_Config.m_XcCustomConsoleBrightness, &Button, Localize("Console Wallpaper Brightness"), 0, 100, &CUi::ms_LinearScrollbarScale, 0u, "%");
+
+            TotalHeight += 35;
         }
         if(g_Config.m_XcCustomConsole) {
             Ui()->DoScrollbarOption(&g_Config.m_XcLocalConsoleAlpha, &g_Config.m_XcLocalConsoleAlpha, &Button, Localize("Local Console Opacity"), 0, 100, &CUi::ms_LinearScrollbarScale, 0u, "%");
@@ -205,7 +208,7 @@ void CMenus::RenderSettingsXChallange(CUIRect MainView)
 
     s_ScrollRegion.End();
 }
-
+//TODO: SOMEWHEN
 /*
 		CUIRect DirectoryButton;
 		Left.HSplitBottom(20.0f, &Left, &DirectoryButton);

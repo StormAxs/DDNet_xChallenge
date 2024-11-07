@@ -260,20 +260,3 @@ from Tavmjong Bah. For further information, contact: tavmjong @ free
 . fr.
 
 -------------------------------------------------------------------
-
-Open Usage License
-
-Copyright © 2024 StormA/xChallange
-
-Permission is hereby granted to any person obtaining a copy of this software and associated documentation files (the "Software") to use, copy, modify, and distribute copies of the Software, subject to the following conditions:
-
-    Attribution
-    If you use any part of this code, you must include a clear and visible acknowledgment of the original source. This acknowledgment should state the source repository or author, and must not be hidden from end users or made difficult to find.
-
-    Open Access
-    Any project or repository that incorporates any part of this Software must be public. You are not permitted to make derived works private, nor restrict access to them, as long as they incorporate any part of this Software.
-
-    Redistribution
-    You are allowed to redistribute the Software and modifications thereof, provided that all such redistributions adhere to the Attribution and Open Access conditions outlined in this license.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

@@ -174,13 +174,11 @@ void CMenus::RenderSettingsXChallange(CUIRect MainView)
                           &g_Config.m_XcConsoleBarColor,
                           ColorRGBA(8883654),
                           false);
-
             TotalHeight += 20.0f;
         }
 
-        ConsoleGroup.HSplitTop(20.f, &Button, &ConsoleGroup);
-
         if(g_Config.m_XcCustomConIcons) {
+                        ConsoleGroup.HSplitTop(20.f, &Button, &ConsoleGroup);
             Ui()->DoScrollbarOption(&g_Config.m_XcLocalConsoleAlpha, &g_Config.m_XcLocalConsoleAlpha, &Button, Localize("Local Console Opacity"), 0, 100, &CUi::ms_LinearScrollbarScale, 0u, "%");
             ConsoleGroup.HSplitTop(20.f, &Button, &ConsoleGroup);
             Ui()->DoScrollbarOption(&g_Config.m_XcCustomConsoleBrightness, &g_Config.m_XcCustomConsoleBrightness, &Button, Localize("Console Wallpaper Brightness"), 0, 100, &CUi::ms_LinearScrollbarScale, 0u, "%");
@@ -188,6 +186,7 @@ void CMenus::RenderSettingsXChallange(CUIRect MainView)
             TotalHeight += 35;
         }
         if(g_Config.m_XcCustomConsole) {
+                        ConsoleGroup.HSplitTop(20.f, &Button, &ConsoleGroup);
             Ui()->DoScrollbarOption(&g_Config.m_XcLocalConsoleAlpha, &g_Config.m_XcLocalConsoleAlpha, &Button, Localize("Local Console Opacity"), 0, 100, &CUi::ms_LinearScrollbarScale, 0u, "%");
             //rcon
             ConsoleGroup.HSplitTop(20.f, &Button, &ConsoleGroup);
@@ -196,9 +195,9 @@ void CMenus::RenderSettingsXChallange(CUIRect MainView)
         if(g_Config.m_XcConsoleAnimation) {
             ConsoleGroup.HSplitTop(20.f, &Button, &ConsoleGroup);
             Ui()->DoScrollbarOption(&g_Config.m_XcConsoleAnimationSpeed, &g_Config.m_XcConsoleAnimationSpeed, &Button, Localize("Console opening speed"), 5, 0, &CUi::ms_LinearScrollbarScale, 0u, "");
-
-            TotalHeight += 30.0f;
+            TotalHeight += 10.0f;
         }
+
         // Done with code
         return TotalHeight + Margin;
     });

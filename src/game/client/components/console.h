@@ -185,6 +185,8 @@ public:
 	void PrintLine(int Type, const char *pLine);
 	void RequireUsername(bool UsernameReq);
 
+	void RenderCustomConsoleBar(const char* aPath);
+
 	virtual void OnStateChange(int NewState, int OldState) override;
 	virtual void OnConsoleInit() override;
 	virtual void OnInit() override;

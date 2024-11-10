@@ -1,5 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#define STB_IMAGE_IMPLEMENTATION
+#include <engine/external/stb_image/stb_image.h>
+#include <GL/glew.h>
 
 #include <base/lock.h>
 #include <base/logger.h>
@@ -990,10 +993,15 @@ void CGameConsole::OnRender()
 {
 	CUIRect Screen = *Ui()->Screen();
 	CInstance *pConsole = CurrentConsole();
-
-	const float MaxConsoleHeight = Screen.h * 3 / 5.0f;
-	float Progress = (Client()->GlobalTime() - (m_StateChangeEnd - m_StateChangeDuration)) / m_StateChangeDuration;
-
+//Anim speed
+	const float MaxConsoleHeight = Screen.h * 3.5 / 5.0f;
+	float Progress;
+	if(g_Config.m_XcConsoleAnimation) {
+		Progress = (Client()->GlobalTime() - (m_StateChangeEnd - m_StateChangeDuration)) / m_StateChangeDuration / g_Config.m_XcConsoleAnimationSpeed;
+	}
+	else {
+		Progress = (Client()->GlobalTime() - (m_StateChangeEnd - m_StateChangeDuration)) / m_StateChangeDuration;
+	}
 	if(Progress >= 1.0f)
 	{
 		if(m_ConsoleState == CONSOLE_CLOSING)
@@ -1030,6 +1038,84 @@ void CGameConsole::OnRender()
 	const float ConsoleHeight = ConsoleHeightScale * MaxConsoleHeight;
 
 	Ui()->MapScreen();
+//Xc===========================================================================================================
+
+	ColorRGBA XcLocalConsoleColor = color_cast<ColorRGBA, ColorHSVA>(ColorHSVA(g_Config.m_XcLocalConsoleColor));
+	XcLocalConsoleColor.a = g_Config.m_XcLocalConsoleAlpha / 100.0f;
+	ColorRGBA XcRemoteConsoleColor = color_cast<ColorRGBA, ColorHSVA>(ColorHSVA(g_Config.m_XcRemoteConsoleColor));
+	XcRemoteConsoleColor.a = g_Config.m_XcRemoteConsoleAlpha / 100.0f;
+
+	ColorRGBA XcConsoleBarColor = color_cast<ColorRGBA, ColorHSVA>(ColorHSVA(g_Config.m_XcConsoleBarColor));
+
+	float BRTH = g_Config.m_XcCustomConsoleBrightness;
+	float ALPH = g_Config.m_XcLocalConsoleAlpha;;
+	ColorRGBA XcCustomConsoleBrightness = color_cast<ColorRGBA, ColorHSVA>(ColorHSVA(0, 0, BRTH / 100, ALPH / 100));
+
+	//TODO:Remade shadows
+
+	IGraphics::CQuadItem QuadItem(0, ConsoleHeight, Screen.w, 10.0f);\
+
+
+	// do background (ddmet)
+	if(g_Config.m_XcCustomConIcons) {
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_CONSOLE_ICON].m_Id);
+		Graphics()->QuadsBegin();
+		Graphics()->SetColor(XcCustomConsoleBrightness);
+
+//GPT my beloved
+
+		float TextureWidth;
+		float TextureHeight	;
+		if(g_Config.m_XcWallpaperConsoleScaling) {
+			TextureHeight = g_Config.m_XcWallpaperConsoleScalingH;
+			TextureWidth = g_Config.m_XcWallpaperConsoleScalingW;
+		}
+		else { //use default
+			TextureWidth = 1920; //! Your screen width
+			TextureHeight = 760; //! Your Screen height devided by / 3 + 50	(1080 / 3 + 50)
+		}
+
+		//Scaling formula
+		float ScaleFactor = Screen.w / TextureWidth;
+		float ScaledWidth = TextureWidth * ScaleFactor;
+		float ScaledHeight = TextureHeight * ScaleFactor;
+
+		float xOffset = (Screen.w - ScaledWidth) / 2.0f;  // Horizontal centering
+		float yOffset = ConsoleHeight - ScaledHeight;  // Bottom-aligned position
+
+		if (ScaledHeight > ConsoleHeight) {
+			yOffset = -ScaledHeight + ConsoleHeight;  // Move it upwards, but bottom sticks
+		}
+		Graphics()->QuadsSetSubset(0, 0, 1, 1);
+		//finish drawing
+		IGraphics::CQuadItem QuadItem(xOffset, yOffset, ScaledWidth, ScaledHeight);
+		Graphics()->QuadsDrawTL(&QuadItem, 1);
+		Graphics()->QuadsEnd();
+	}
+	else if(g_Config.m_XcCustomConsole) {
+
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_NULL].m_Id);
+		Graphics()->QuadsBegin();
+		Graphics()->SetColor(XcLocalConsoleColor);
+		if(m_ConsoleType == CONSOLETYPE_REMOTE)
+			Graphics()->SetColor(XcRemoteConsoleColor);
+		Graphics()->QuadsSetSubset(0, -ConsoleHeight * 0.075f, Screen.w * 0.075f * 0.5f, 0);
+		QuadItem = IGraphics::CQuadItem(0, 0, Screen.w, ConsoleHeight);
+		Graphics()->QuadsDrawTL(&QuadItem, 1);
+		Graphics()->QuadsEnd();
+	}
+	else
+	{
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_CONSOLE_BG].m_Id);
+		Graphics()->QuadsBegin();
+		Graphics()->SetColor(0.2f, 0.2f, 0.2f, 0.9f);
+		if(m_ConsoleType == CONSOLETYPE_REMOTE)
+			Graphics()->SetColor(0.4f, 0.2f, 0.2f, 0.9f);
+		Graphics()->QuadsSetSubset(0, -ConsoleHeight * 0.075f, Screen.w * 0.075f * 0.5f, 0);
+		QuadItem = IGraphics::CQuadItem(0, 0, Screen.w, ConsoleHeight);
+		Graphics()->QuadsDrawTL(&QuadItem, 1);
+		Graphics()->QuadsEnd();
+	}
 
 	// do console shadow
 	Graphics()->TextureClear();

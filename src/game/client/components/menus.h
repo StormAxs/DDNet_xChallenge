@@ -35,6 +35,12 @@ struct CServerProcess
 	PROCESS m_Process;
 };
 
+struct SFoldableSection
+{
+	bool m_Opened = false;
+	int m_Height = 0;
+};
+
 // component to fetch keypresses, override all other input
 class CMenusKeyBinder : public CComponent
 {
@@ -80,6 +86,9 @@ class CMenus : public CComponent
 	int DoButton_CheckBoxAutoVMarginAndSet(const void *pId, const char *pText, int *pValue, CUIRect *pRect, float VMargin);
 	int DoButton_CheckBox_Number(const void *pId, const char *pText, int Checked, const CUIRect *pRect);
 
+	int DoButton_FoldableSection(SFoldableSection *pSection, const char *pText, float FontSize, const CUIRect *pRect, float CornerRounding = 0.f);
+	int DoFoldableSection(SFoldableSection *pSection, const char *pText, float FontSize, CUIRect *pRect, CUIRect *pRectAfter, float CornerRounding, const std::function<int()> &fnRender);
+
 	ColorHSLA DoLine_ColorPicker(CButtonContainer *pResetId, float LineSize, float LabelSize, float BottomMargin, CUIRect *pMainRect, const char *pText, unsigned int *pColorValue, ColorRGBA DefaultColor, bool CheckBoxSpacing = true, int *pCheckBoxValue = nullptr, bool Alpha = false);
 	ColorHSLA DoButton_ColorPicker(const CUIRect *pRect, unsigned int *pHslaColor, bool Alpha);
 	void DoLaserPreview(const CUIRect *pRect, ColorHSLA OutlineColor, ColorHSLA InnerColor, const int LaserType);
@@ -121,6 +130,7 @@ public:
 
 	struct SCustomGame : public SCustomItem
 	{
+
 	};
 
 	struct SCustomEmoticon : public SCustomItem
@@ -609,6 +619,7 @@ protected:
 	void RenderSettingsSound(CUIRect MainView);
 	void RenderSettings(CUIRect MainView);
 	void RenderSettingsCustom(CUIRect MainView);
+	void RenderSettingsXChallange(CUIRect MainView);
 
 	class CMapListItem
 	{
@@ -707,6 +718,7 @@ public:
 		SETTINGS_SOUND,
 		SETTINGS_DDNET,
 		SETTINGS_ASSETS,
+		SETTINGS_XC,
 
 		SETTINGS_LENGTH,
 

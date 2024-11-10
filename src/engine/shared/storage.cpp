@@ -107,6 +107,9 @@ public:
 				CreateFolder("assets/particles", TYPE_SAVE);
 				CreateFolder("assets/hud", TYPE_SAVE);
 				CreateFolder("assets/extras", TYPE_SAVE);
+				CreateFolder("xc_data", TYPE_SAVE);
+				CreateFolder("xc_data/console_wallpapers", TYPE_SAVE);
+
 #if defined(CONF_VIDEORECORDER)
 				CreateFolder("videos", TYPE_SAVE);
 #endif

@@ -817,6 +817,14 @@ endif()
 # DEPENDENCY COMPILATION
 ########################################################################
 
+# Define the source files for stb_image
+set(DEP_STB_IMAGE_SRC src/engine/external/stb_image/stb_image_impl.cpp)
+
+# Create an object library for stb_image
+add_library(stb_image EXCLUDE_FROM_ALL OBJECT ${DEP_STB_IMAGE_SRC})
+set_target_properties(stb_image PROPERTIES LINKER_LANGUAGE CXX)
+##xC support
+
 set_src(DEP_JSON_SRC GLOB src/engine/external/json-parser json.c json.h)
 add_library(json EXCLUDE_FROM_ALL OBJECT ${DEP_JSON_SRC})
 
@@ -2062,6 +2070,7 @@ set_src(ENGINE_SHARED GLOB_RECURSE src/engine/shared
   config.cpp
   config.h
   config_variables.h
+  config_variables_xc.h
   console.cpp
   console.h
   csv.cpp
@@ -2337,6 +2346,7 @@ if(CLIENT)
     components/chat.cpp
     components/chat.h
     components/console.cpp
+   # components/xchallange/console_flex.cpp
     components/console.h
     components/controls.cpp
     components/controls.h
@@ -2376,6 +2386,7 @@ if(CLIENT)
     components/menus_demo.cpp
     components/menus_ingame.cpp
     components/menus_settings.cpp
+    components/menus_settings_xc.cpp
     components/menus_settings7.cpp
     components/menus_settings_assets.cpp
     components/menus_start.cpp

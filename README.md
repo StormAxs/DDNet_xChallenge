@@ -2,33 +2,17 @@
 
 Our own flavor of DDRace, a Teeworlds mod. See the [website](https://ddnet.org) for more information.
 
-Development discussions happen on #ddnet on Quakenet ([Webchat](http://webchat.quakenet.org/?channels=ddnet&uio=d4)) or on [Discord in the developer channel](https://discord.gg/xsEd9xu).
-
-You can get binary releases on the [DDNet website](https://ddnet.org/downloads/), find it on [Steam](https://store.steampowered.com/app/412220/DDraceNetwork/) or [install from repository](#installation-from-repository).
-
-- [Code Browser](https://ddnet.org/codebrowser/DDNet/)
-- [Source Code Documentation](https://codedoc.ddnet.org/) (very incomplete, only a few items are documented)
-
-If you want to learn about the source code, you can check the [Development](https://wiki.ddnet.org/wiki/Development) article on the wiki.
 
 Cloning
 -------
 
-To clone this repository with full history and external libraries (~350 MB):
+    git clone https://github.com/StormAxs/DDNet_xChallenge
 
-    git clone --recursive https://github.com/ddnet/ddnet
 
-To clone this repository with full history when you have the necessary libraries on your system already (~220 MB):
+To clone this repository with full history and external libraries:
 
-    git clone https://github.com/ddnet/ddnet
+    git clone --recursive https://github.com/StormAxs/DDNet_xChallenge
 
-To clone this repository with history since we moved the libraries to https://github.com/ddnet/ddnet-libs (~40 MB):
-
-    git clone --shallow-exclude=included-libs https://github.com/ddnet/ddnet
-
-To clone the libraries if you have previously cloned DDNet without them, or if you require the ddnet-libs history instead of a shallow clone:
-
-    git submodule update --init --recursive
 
 Dependencies on Linux / macOS
 -----------------------------
@@ -209,21 +193,6 @@ Now open up your Project folder, Visual Studio should automatically detect and c
 
 On your tools hotbar next to the triangular "Run" Button, you can now select what you want to start (e.g game-client or game-server) and build it.
 
-Building on Windows with standalone MSVC build tools 
---------------------------------------
-
-First off you will need to install the MSVC [Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/), [Python 3](https://www.python.org/downloads/) as well as [Rust](https://www.rust-lang.org/tools/install).
-
-To compile and build DDNet on Windows, use your IDE of choice either with a CMake integration (e.g Visual Studio Code), or by ~~**deprecated**~~ using the CMake GUI.
-
-Configure CMake to use the MSVC Build Tools appropriate to your System by your IDE's instructions.
-
-If you're using Visual Studio Code, you can use the [CMake Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools) extension to configure and build the project.
-
-You can then open the project folder in VSC and press `Ctrl+Shift+P` to open the command palette, then search for `CMake: Configure`
-
-This will open up a prompt for you to select a kit, select your `Visual Studio` version and save it. You can now use the GUI (bottom left) to compile and build your project.
-
 
 Cross-compiling on Linux to Windows x86/x86\_64
 -----------------------------------------------
@@ -234,158 +203,3 @@ Install MinGW cross-compilers of the form `i686-w64-mingw32-gcc` (32 bit) or
 Then add `-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchains/mingw64.toolchain` to the
 **initial** CMake command line.
 
-Cross-compiling on Linux to WebAssembly via Emscripten
---------------------------------------------------------
-
-Install Emscripten cross-compilers (e.g. `sudo apt install emscripten`) on a modern linux distro.
-
-If you need to compile the ddnet-libs for WebAssembly, simply call
-
-```bash
-# <directory to build in> should be a directory outside of the project's source directory
-scripts/compile_libs/gen_libs.sh <directory to build in> webasm
-```
-
-from the project's source directory. It will automatically create a directory called `ddnet-libs`.
-You can then manually merge this directory with the one in the ddnet source directory.
-
-Then run `emcmake cmake .. -DVIDEORECORDER=OFF -DVULKAN=OFF -DSERVER=OFF -DTOOLS=OFF -DPREFER_BUNDLED_LIBS=ON` in your build directory.
-
-To test the compiled code locally, just use `emrun --browser firefox DDNet.html`
-
-To host the compiled .html file copy all `.data`, `.html`, `.js`, `.wasm` files to the web server. (see /other/emscripten/minimal.html for a minimal html example)
-
-Then enable cross origin policies. Example for apache2 on debian based distros:
-```bash
-sudo a2enmod header
-
-# edit the apache2 config to allow .htaccess files
-sudo nano /etc/apache2/apache2.conf
-
-# set AllowOverride to All for your directory
-# then create a .htaccess file on the web server (where the .html is)
-# and add these lines
-Header add Cross-Origin-Embedder-Policy "require-corp"
-Header add Cross-Origin-Opener-Policy "same-origin"
-
-# now restart apache2
-sudo service apache2 restart
-```
-
-Cross-compiling on Linux to macOS
----------------------------------
-
-Install [osxcross](https://github.com/tpoechtrager/osxcross), then add
-`-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchains/darwin.toolchain` and
-`-DCMAKE_OSX_SYSROOT=/path/to/osxcross/target/SDK/MacOSX10.11.sdk/` to the
-**initial** CMake command line.
-
-Install `dmg` and `hfsplus` from
-[libdmg-hfsplus](https://github.com/mozilla/libdmg-hfsplus) and `newfs_hfs`
-from
-[diskdev\_cmds](http://pkgs.fedoraproject.org/repo/pkgs/hfsplus-tools/diskdev_cmds-540.1.linux3.tar.gz/0435afc389b919027b69616ad1b05709/diskdev_cmds-540.1.linux3.tar.gz)
-to unlock the `package_dmg` target that outputs a macOS disk image.
-
-Importing the official DDNet Database
--------------------------------------
-
-```bash
-$ wget https://ddnet.org/stats/ddnet-sql.zip
-$ unzip ddnet-sql.zip
-$ yaourt -S mariadb mysql-connector-c++
-$ mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
-$ systemctl start mariadb
-$ mysqladmin -u root password 'PW'
-$ mysql -u root -p'PW'
-MariaDB [(none)]> create database teeworlds; create user 'teeworlds'@'localhost' identified by 'PW2'; grant all privileges on teeworlds.* to 'teeworlds'@'localhost'; flush privileges;
-# this takes a while, you can remove the KEYs in record_race.sql to trade performance in queries
-$ mysql -u teeworlds -p'PW2' teeworlds < ddnet-sql/record_*.sql
-
-$ cat mine.cfg
-sv_use_sql 1
-add_sqlserver r teeworlds record teeworlds "PW2" "localhost" "3306"
-add_sqlserver w teeworlds record teeworlds "PW2" "localhost" "3306"
-
-$ mkdir build
-$ cd build
-$ cmake -DMYSQL=ON ..
-$ make -j$(nproc)
-$ ./DDNet-Server -f mine.cfg
-```
-
-<a href="https://repology.org/metapackage/ddnet/versions">
-    <img src="https://repology.org/badge/vertical-allrepos/ddnet.svg?header=" alt="Packaging status" align="right">
-</a>
-
-Installation from Repository
-----------------------------
-
-Debian/Ubuntu
-
-```bash
-$ apt-get install ddnet
-
-```
-
-MacOS
-
-```bash
-$ brew install --cask ddnet
-```
-
-Fedora
-
-```bash
-$ dnf install ddnet
-```
-
-Arch Linux
-
-```bash
-$ yay -S ddnet
-```
-
-FreeBSD
-
-```bash
-$ pkg install DDNet
-```
-
-Windows (Scoop)
-```
-scoop bucket add games
-scoop install games/ddnet
-```
-
-Benchmarking
-------------
-
-DDNet is available in the [Phoronix Test Suite](https://openbenchmarking.org/test/pts/ddnet). If you have PTS installed you can easily benchmark DDNet on your own system like this:
-
-```bash
-$ phoronix-test-suite benchmark ddnet
-```
-
-Better Git Blame
-----------------
-
-First, use a better tool than `git blame` itself, e.g. [`tig`](https://jonas.github.io/tig/). There's probably a good UI for Windows, too. Alternatively, use the GitHub UI, click "Blame" in any file view.
-
-For `tig`, use `tig blame path/to/file.cpp` to open the blame view, you can navigate with arrow keys or kj, press comma to go to the previous revision of the current line, q to quit.
-
-Only then you could also set up git to ignore specific formatting revisions:
-```bash
-git config blame.ignoreRevsFile formatting-revs.txt
-```
-
-(Neo)Vim Syntax Highlighting for config files
-----------------------------------------
-Copy the file detection and syntax files to your vim config folder:
-
-```bash
-# vim
-cp -R other/vim/* ~/.vim/
-
-# neovim
-cp -R other/vim/* ~/.config/nvim/
-```

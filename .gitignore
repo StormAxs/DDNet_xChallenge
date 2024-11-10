@@ -147,3 +147,10 @@ tags
 *.user
 *.vcxproj
 *.zip
+win-build/.rustc_info.json
+win-build/client.manifest
+win-build/integration_test.sh
+win-build/lsan.supp
+win-build/memcheck.supp
+win-build/ubsan.supp
+win-build/valgrind.supp

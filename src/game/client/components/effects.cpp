@@ -168,11 +168,20 @@ void CEffects::BulletTrail(vec2 Pos, float Alpha, float TimePassed)
 	if(!m_Add100hz && TimePassed < 0.001f)
 		return;
 
+	float SmokeTrail = 0;
+	SmokeTrail = g_Config.m_XcBulletSmokeTrailLifeSpan;
 	CParticle p;
 	p.SetDefault();
 	p.m_Spr = SPRITE_PART_BALL;
 	p.m_Pos = Pos;
-	p.m_LifeSpan = random_float(0.25f, 0.5f);
+	if(g_Config.m_XcBulletSmokeTrail) {
+	//uncommit if bugged
+	//p.m_LifeSpan = SmokeTrail / 100;
+	p.m_LifeSpan = random_float((SmokeTrail / 100) / 2, SmokeTrail / 100);
+	}
+	else {
+		p.m_LifeSpan = random_float(0.25f, 0.5f);
+	}
 	p.m_StartSize = 8.0f;
 	p.m_EndSize = 0;
 	p.m_Friction = 0.7f;

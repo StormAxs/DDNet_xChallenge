@@ -20,3 +20,7 @@ MACRO_CONFIG_INT(XcWallpaperConsoleScaling, xc_icon_con_scale, 0, 0, 1, CFGFLAG_
 MACRO_CONFIG_INT(XcWallpaperConsoleScalingW, xc_icon_con_scale_w, 1920, 800, 4096, CFGFLAG_CLIENT | CFGFLAG_SAVE, "custom pic scaling (width")
 MACRO_CONFIG_INT(XcWallpaperConsoleScalingH, xc_icon_con_scale_h, 1080, 600, 2160, CFGFLAG_CLIENT | CFGFLAG_SAVE, "custom pic scaling (height")
 
+//BulletTrails
+MACRO_CONFIG_INT(XcBulletSmokeTrail, xc_bullet_smoke_trail, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable custom bullet trail")
+MACRO_CONFIG_INT(XcBulletSmokeTrailLifeSpan, xc_bullet_smoke_trail_lifespan, 50, 0, 200, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Custom bullet trail: Smoke lifespan")
+

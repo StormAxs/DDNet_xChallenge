@@ -61,7 +61,7 @@ void CMenus::RenderSettingsXChallange(CUIRect MainView)
     const float ColorPickerLabelSize = 13.0f;
     const float ColorPickerLineSpacing = 5.0f;
 
-    CUIRect GeneralGroup, ConsoleGroup;
+    CUIRect GeneralGroup, ConsoleGroup, VisualGroup;
     MainView.y -= 10.0f;
 
     // Begining of the section
@@ -147,7 +147,6 @@ void CMenus::RenderSettingsXChallange(CUIRect MainView)
            g_Config.m_XcConsoleAnimation ^= 1;
         }
 
-
         int i = 0;
           static CButtonContainer s_aResetIDs[24];
         if(g_Config.m_XcCustomConsole) {
@@ -203,6 +202,50 @@ void CMenus::RenderSettingsXChallange(CUIRect MainView)
     });
     s_ScrollRegion.AddRect(ConsoleGroup);
     //Section:end
+
+    // Begining of the section
+    static SFoldableSection s_InVisualGroup;
+    MainView.HSplitTop(Margin, nullptr, &VisualGroup);
+    DoFoldableSection(&s_InVisualGroup, Localize("VISUAL"), FontSize, &VisualGroup, &MainView, 5.0f, [&]() -> int {
+        VisualGroup.VMargin(Margin, &VisualGroup);
+        VisualGroup.HMargin(Margin, &VisualGroup);
+        // Code stuff
+                int TotalHeightVISUALS = 40.0f; // section height
+        //Section inside section
+
+         // Begining of the section
+    static SFoldableSection s_InVisualGroupBullets;
+    CUIRect VisualGroupBullets;
+    MainView.HSplitTop(Margin, nullptr, &VisualGroupBullets);
+    DoFoldableSection(&s_InVisualGroupBullets, Localize("BulletTrails"), FontSize, &VisualGroup, &MainView, 5.0f, [&]() -> int {
+        VisualGroupBullets.VMargin(Margin, &VisualGroupBullets);
+        VisualGroupBullets.HMargin(Margin, &VisualGroupBullets);
+        int TotalHeightBullets = 0.0f; // section height
+        // Code stuff
+        CUIRect Button;
+
+                TotalHeightBullets += 25;
+                TotalHeightVISUALS += 30;
+       // VisualGroupBullets.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.5f), IGraphics::CORNER_ALL, 15.0f);
+        VisualGroupBullets.VSplitLeft(5.0f, nullptr, &VisualGroupBullets);
+        VisualGroupBullets.HSplitTop(LineSize, &Button, &VisualGroupBullets);
+        if(DoButton_CheckBox(&g_Config.m_XcBulletSmokeTrail, Localize("Enable custom bullet trails"), g_Config.m_XcBulletSmokeTrail, &Button))
+        {
+            g_Config.m_XcBulletSmokeTrail ^= 1;
+        }
+        if(g_Config.m_XcBulletSmokeTrail)
+        {
+            Ui()->DoScrollbarOption(&g_Config.m_XcBulletSmokeTrailLifeSpan, &g_Config.m_XcBulletSmokeTrailLifeSpan, &Button, Localize("Bullet trail lifespan"), 0, 200, &CUi::ms_LinearScrollbarScale, 0u, "");
+        }
+   //     VisualGroupBullets.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.5f), IGraphics::CORNER_ALL, 15.0f);
+
+        // Done with code
+        return TotalHeightBullets + Margin;
+    });
+     s_ScrollRegion.AddRect(VisualGroupBullets);
+        return TotalHeightVISUALS + Margin;
+    });
+    s_ScrollRegion.AddRect(VisualGroup);
 
 
     s_ScrollRegion.End();

@@ -203,49 +203,55 @@ void CMenus::RenderSettingsXChallange(CUIRect MainView)
     s_ScrollRegion.AddRect(ConsoleGroup);
     //Section:end
 
-    // Begining of the section
-    static SFoldableSection s_InVisualGroup;
-    MainView.HSplitTop(Margin, nullptr, &VisualGroup);
-    DoFoldableSection(&s_InVisualGroup, Localize("VISUAL"), FontSize, &VisualGroup, &MainView, 5.0f, [&]() -> int {
-        VisualGroup.VMargin(Margin, &VisualGroup);
-        VisualGroup.HMargin(Margin, &VisualGroup);
-        // Code stuff
-                int TotalHeightVISUALS = 40.0f; // section height
-        //Section inside section
+// Begining of the section
+static SFoldableSection s_InVisualGroup;
+CUIRect VisualGroup_Bullets;
+MainView.HSplitTop(Margin, nullptr, &VisualGroup);
 
-         // Begining of the section
-    static SFoldableSection s_InVisualGroupBullets;
-    CUIRect VisualGroupBullets;
-    MainView.HSplitTop(Margin, nullptr, &VisualGroupBullets);
-    DoFoldableSection(&s_InVisualGroupBullets, Localize("BulletTrails"), FontSize, &VisualGroup, &MainView, 5.0f, [&]() -> int {
-        VisualGroupBullets.VMargin(Margin, &VisualGroupBullets);
-        VisualGroupBullets.HMargin(Margin, &VisualGroupBullets);
-        int TotalHeightBullets = 0.0f; // section height
-        // Code stuff
+DoFoldableSection(&s_InVisualGroup, Localize("Visual"), FontSize, &VisualGroup, &MainView, 5.0f, [&]() -> int {
+    int TotalHeightVisual = 50.0f; // section height
+    VisualGroup.VMargin(Margin, &VisualGroup);
+    VisualGroup.HMargin(Margin, &VisualGroup);
+
+    // BulletTrails Section
+    static SFoldableSection s_InVisualGroup_Bullets;
+    VisualGroup.HSplitTop(Margin, nullptr, &VisualGroup_Bullets);
+    DoFoldableSection(&s_InVisualGroup_Bullets, Localize("BulletTrails"), FontSize, &VisualGroup_Bullets, &MainView, 5.0f, [&]() -> int {
+        int TotalHeightVisual_Bullets = 25.0f; // section height for BulletTrails
+        TotalHeightVisual += 30.0f; // Incrementing TotalHeightVisual for BulletTrails section
+
+        VisualGroup_Bullets.VMargin(Margin, &VisualGroup_Bullets);
+        VisualGroup_Bullets.HMargin(Margin, &VisualGroup_Bullets);
+
+        // Bullet Smoke Trail Checkbox
         CUIRect Button;
-
-                TotalHeightBullets += 25;
-                TotalHeightVISUALS += 30;
-       // VisualGroupBullets.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.5f), IGraphics::CORNER_ALL, 15.0f);
-        VisualGroupBullets.VSplitLeft(5.0f, nullptr, &VisualGroupBullets);
-        VisualGroupBullets.HSplitTop(LineSize, &Button, &VisualGroupBullets);
-        if(DoButton_CheckBox(&g_Config.m_XcBulletSmokeTrail, Localize("Enable custom bullet trails"), g_Config.m_XcBulletSmokeTrail, &Button))
-        {
+        VisualGroup_Bullets.HSplitTop(LineSize, &Button, &VisualGroup_Bullets);
+        if (DoButton_CheckBox(&g_Config.m_XcBulletSmokeTrail, Localize("Enable custom bullet trails"), g_Config.m_XcBulletSmokeTrail, &Button)) {
             g_Config.m_XcBulletSmokeTrail ^= 1;
         }
-        if(g_Config.m_XcBulletSmokeTrail)
-        {
-            Ui()->DoScrollbarOption(&g_Config.m_XcBulletSmokeTrailLifeSpan, &g_Config.m_XcBulletSmokeTrailLifeSpan, &Button, Localize("Bullet trail lifespan"), 0, 200, &CUi::ms_LinearScrollbarScale, 0u, "");
-        }
-   //     VisualGroupBullets.Draw(ColorRGBA(0.0f, 0.0f, 0.0f, 0.5f), IGraphics::CORNER_ALL, 15.0f);
 
-        // Done with code
-        return TotalHeightBullets + Margin;
+        // Bullet Smoke Trail Lifespan
+        VisualGroup_Bullets.HSplitTop(LineSize, &Button, &VisualGroup_Bullets);
+        if (g_Config.m_XcBulletSmokeTrail) {
+            Ui()->DoScrollbarOption(&g_Config.m_XcBulletSmokeTrailLifeSpan,
+                                    &g_Config.m_XcBulletSmokeTrailLifeSpan, &Button,
+                                    Localize("Bullet trail lifespan"), 0, 200,
+                                    &CUi::ms_LinearScrollbarScale, 0u, "");
+            TotalHeightVisual_Bullets += 25;
+            TotalHeightVisual += 25;
+        }
+
+        // Done with BulletTrails section
+        return TotalHeightVisual_Bullets + Margin;
     });
-     s_ScrollRegion.AddRect(VisualGroupBullets);
-        return TotalHeightVISUALS + Margin;
-    });
-    s_ScrollRegion.AddRect(VisualGroup);
+    s_ScrollRegion.AddRect(VisualGroup_Bullets);
+
+    // Done with visual section
+    return TotalHeightVisual + Margin;
+});
+
+s_ScrollRegion.AddRect(VisualGroup);
+// End of section
 
 
     s_ScrollRegion.End();

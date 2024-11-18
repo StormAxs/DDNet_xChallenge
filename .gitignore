@@ -8,6 +8,7 @@ docs/
 bundle/
 !/other/bundle/
 
+CMakeLists.txt
 .DS_Store
 .ninja_deps
 .ninja_log

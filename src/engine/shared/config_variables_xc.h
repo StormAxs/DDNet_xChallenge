@@ -24,3 +24,6 @@ MACRO_CONFIG_INT(XcWallpaperConsoleScalingH, xc_icon_con_scale_h, 1080, 600, 216
 MACRO_CONFIG_INT(XcBulletSmokeTrail, xc_bullet_smoke_trail, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable custom bullet trail")
 MACRO_CONFIG_INT(XcBulletSmokeTrailLifeSpan, xc_bullet_smoke_trail_lifespan, 50, 0, 200, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Custom bullet trail: Smoke lifespan")
 
+//Turn off snowflakes
+MACRO_CONFIG_INT(XcSnowflakes, xc_snowflakes, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable snowflakes(while freezed)")
+

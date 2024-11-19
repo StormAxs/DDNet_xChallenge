@@ -194,7 +194,7 @@ void CMenus::RenderSettingsXChallange(CUIRect MainView)
         if(g_Config.m_XcConsoleAnimation) {
             ConsoleGroup.HSplitTop(20.f, &Button, &ConsoleGroup);
             Ui()->DoScrollbarOption(&g_Config.m_XcConsoleAnimationSpeed, &g_Config.m_XcConsoleAnimationSpeed, &Button, Localize("Console opening speed"), 5, 0, &CUi::ms_LinearScrollbarScale, 0u, "");
-            TotalHeight += 10.0f;
+            TotalHeight += 15.0f;
         }
 
         // Done with code

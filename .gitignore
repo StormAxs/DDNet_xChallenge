@@ -8,7 +8,6 @@ docs/
 bundle/
 !/other/bundle/
 
-CMakeLists.txt
 .DS_Store
 .ninja_deps
 .ninja_log
@@ -41,7 +40,6 @@ pack_*/
 release
 rules.ninja
 testrunner\[1\]_include.cmake
-
 /SDL2.framework
 
 # Android

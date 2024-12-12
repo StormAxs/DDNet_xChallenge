@@ -5,8 +5,8 @@
 
 # BRA
 ## Coloque o arquivo .png nesta pasta e renomeie ele para **console_bg**
-Resolução mínima - 800x100
-Resolução recomendada - 1920x1080 e acima (Talvez corte o topo da imagem)
+- Resolução mínima - 800x100
+- Resolução recomendada - 1920x1080 e acima (Talvez corte o topo da imagem)
 
 # RUS
 ## Поместите .png файл в эту папку, и переименуйте её в **console_bg**

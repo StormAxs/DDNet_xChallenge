@@ -4278,3 +4278,47 @@ int CGameClient::FindFirstMultiViewId()
 	}
 	return ClientId;
 }
+// Megre avoid
+
+void CGameClient::LoadConsoleIcon(const char *pPath, bool AsDir)
+{
+	if(m_ConsoleIconLoaded)
+	{
+		// Unload the existing console icon if it has been loaded
+		Graphics()->UnloadTexture(&m_ConsoleIcon.m_aSpriteConsoleIcon);
+		m_ConsoleIconLoaded = false;
+	}
+
+	char aPath[IO_MAX_PATH_LENGTH];
+	bool IsDefault = false;
+	if(str_comp(pPath, "default") == 0)
+	{
+		str_copy(aPath, g_pData->m_aImages[IMAGE_CONSOLE_ICON].m_pFilename);
+		IsDefault = true;
+	}
+	else
+	{
+		if(AsDir)
+			str_format(aPath, sizeof(aPath), "xc_data/console_wallpapers/%s/%s", pPath, g_pData->m_aImages[IMAGE_CONSOLE_ICON].m_pFilename);
+		else
+			str_format(aPath, sizeof(aPath), "xc_data/console_wallpapers/%s.png", pPath);
+
+	}
+
+	CImageInfo ImgInfo;
+	bool PngLoaded = Graphics()->LoadPng(ImgInfo, aPath, IStorage::TYPE_ALL);
+	if(!PngLoaded && !IsDefault)
+	{
+		if(AsDir)
+			LoadConsoleIcon("default");
+		else
+			LoadConsoleIcon(pPath, true);
+	}
+	else if(PngLoaded && Graphics()->IsImageFormatRgba(aPath, ImgInfo))
+	{
+		// Load the texture directly without grid checks
+		m_ConsoleIcon.m_aSpriteConsoleIcon = Graphics()->LoadSpriteTexture(ImgInfo, &g_pData->m_aSprites[IMAGE_CONSOLE_ICON]);
+		m_ConsoleIconLoaded = true;
+	}
+	ImgInfo.Free();
+}

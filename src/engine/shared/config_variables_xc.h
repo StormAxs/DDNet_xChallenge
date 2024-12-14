@@ -27,3 +27,7 @@ MACRO_CONFIG_INT(XcBulletSmokeTrailLifeSpan, xc_bullet_smoke_trail_lifespan, 50,
 //Turn off snowflakes
 MACRO_CONFIG_INT(XcSnowflakes, xc_snowflakes, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Enable snowflakes(while freezed)")
 
+//Console laod
+MACRO_CONFIG_STR(ClAssetConsole, xc_asset_console, 50, "console_bg", CFGFLAG_SAVE | CFGFLAG_CLIENT, "The asset for console")
+
+

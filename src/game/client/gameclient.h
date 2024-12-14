@@ -616,6 +616,7 @@ public:
 	void LoadParticlesSkin(const char *pPath, bool AsDir = false);
 	void LoadHudSkin(const char *pPath, bool AsDir = false);
 	void LoadExtrasSkin(const char *pPath, bool AsDir = false);
+	void LoadConsoleIcon(const char *pPath, bool AsDir = false);
 
 	struct SClientGameSkin
 	{
@@ -777,6 +778,14 @@ public:
 
 	SClientExtrasSkin m_ExtrasSkin;
 	bool m_ExtrasSkinLoaded = false;
+
+	struct SClientConsoseIcon
+	{
+		IGraphics::CTextureHandle m_aSpriteConsoleIcon;
+	};
+
+	SClientConsoseIcon m_ConsoleIcon;
+	bool m_ConsoleIconLoaded = false;
 
 	const std::vector<CSnapEntities> &SnapEntities() { return m_vSnapEntities; }
 

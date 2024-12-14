@@ -148,11 +148,15 @@ public:
 	struct SCustomExtras : public SCustomItem
 	{
 	};
+	struct SCustomConsole : public SCustomItem
+	{
+	};
 
 protected:
 	std::vector<SCustomEntities> m_vEntitiesList;
 	std::vector<SCustomGame> m_vGameList;
 	std::vector<SCustomEmoticon> m_vEmoticonList;
+	std::vector<SCustomConsole> m_vConsoleList;
 	std::vector<SCustomParticle> m_vParticlesList;
 	std::vector<SCustomHud> m_vHudList;
 	std::vector<SCustomExtras> m_vExtrasList;
@@ -160,9 +164,10 @@ protected:
 	bool m_IsInit = false;
 
 	static void LoadEntities(struct SCustomEntities *pEntitiesItem, void *pUser);
+	static void LoadConsoleImages(SCustomItem *pConsoleItem, void *pUser );
 	static int EntitiesScan(const char *pName, int IsDir, int DirType, void *pUser);
-
 	static int GameScan(const char *pName, int IsDir, int DirType, void *pUser);
+	static int ConsoleScan(const char *pName, int IsDir, int DirType, void *pUser);
 	static int EmoticonsScan(const char *pName, int IsDir, int DirType, void *pUser);
 	static int ParticlesScan(const char *pName, int IsDir, int DirType, void *pUser);
 	static int HudScan(const char *pName, int IsDir, int DirType, void *pUser);

@@ -32,8 +32,28 @@ enum
 	ASSETS_TAB_PARTICLES = 3,
 	ASSETS_TAB_HUD = 4,
 	ASSETS_TAB_EXTRAS = 5,
-	NUMBER_OF_ASSETS_TABS = 6,
+	ASSETS_TAB_CONSOLE = 6, // New console tab
+	NUMBER_OF_ASSETS_TABS = 7,
 };
+
+void CMenus::LoadConsoleImages(SCustomItem *pConsoleItem, void *pUser )
+
+{
+	auto *pRealUser  = (SMenuAssetScanUser  *)pUser ;
+	auto *pThis = (CMenus *)pRealUser ->m_pUser ;
+	char aPath[IO_MAX_PATH_LENGTH];
+	if (str_comp(pConsoleItem->m_aName, "default") == 0)
+	{
+		str_format(aPath, sizeof(aPath), "xc_data/console_wallpapers/console_bg.png");
+		pConsoleItem->m_RenderTexture = pThis->Graphics()->LoadTexture(aPath, IStorage::TYPE_ALL);
+	}
+	else
+	{
+		str_format(aPath, sizeof(aPath), "xc_data/console_wallpapers/%s.png", pConsoleItem->m_aName);
+		pConsoleItem->m_RenderTexture = pThis->Graphics()->LoadTexture(aPath, IStorage::TYPE_ALL);
+	}
+}
+
 
 void CMenus::LoadEntities(SCustomEntities *pEntitiesItem, void *pUser)
 {
@@ -168,6 +188,43 @@ static int AssetScan(const char *pName, int IsDir, int DirType, std::vector<TNam
 
 	return 0;
 }
+int CMenus::ConsoleScan(const char *pName, int IsDir, int DirType, void *pUser )
+
+{
+
+	auto *pRealUser  = (SMenuAssetScanUser  *)pUser ;
+	auto *pThis = (CMenus *)pRealUser ->m_pUser ;
+	if (IsDir)
+	{
+		if (pName[0] == '.')
+			return 0;
+		// default is reserved
+		if (str_comp(pName, "console_bg") == 0)
+			return 0;
+		SCustomConsole ConsoleItem; // Use SCustomConsole instead of SCustomItem
+		str_copy(ConsoleItem.m_aName, pName);
+		LoadConsoleImages(&ConsoleItem, pUser );
+		pThis->m_vConsoleList.push_back(ConsoleItem); // Push back the correct type
+
+
+	}
+	else
+	{
+		if (str_endswith(pName, ".png"))
+		{
+			char aName[IO_MAX_PATH_LENGTH];
+			str_truncate(aName, sizeof(aName), pName, str_length(pName) - 4);
+			// default is reserved
+			if (str_comp(aName, "console_bg") == 0)
+				return 0;
+			SCustomConsole ConsoleItem; // Use SCustomConsole instead of SCustomItem
+			str_copy(ConsoleItem.m_aName, aName);
+			LoadConsoleImages(&ConsoleItem, pUser );
+			pThis->m_vConsoleList.push_back(ConsoleItem); // Push back the correct type
+		}
+	}
+	pRealUser ->m_LoadedFunc();
+}
 
 int CMenus::GameScan(const char *pName, int IsDir, int DirType, void *pUser)
 {
@@ -215,6 +272,7 @@ static std::vector<const CMenus::SCustomEmoticon *> gs_vpSearchEmoticonsList;
 static std::vector<const CMenus::SCustomParticle *> gs_vpSearchParticlesList;
 static std::vector<const CMenus::SCustomHud *> gs_vpSearchHudList;
 static std::vector<const CMenus::SCustomExtras *> gs_vpSearchExtrasList;
+static std::vector<const CMenus::SCustomConsole *> gs_vpSearchConsoleList;
 
 static bool gs_aInitCustomList[NUMBER_OF_ASSETS_TABS] = {
 	true,
@@ -242,6 +300,8 @@ static const CMenus::SCustomItem *GetCustomItem(int CurTab, size_t Index)
 		return gs_vpSearchHudList[Index];
 	else if(CurTab == ASSETS_TAB_EXTRAS)
 		return gs_vpSearchExtrasList[Index];
+	else if(CurTab == ASSETS_TAB_CONSOLE)
+		return gs_vpSearchConsoleList[Index];
 
 	return NULL;
 }
@@ -307,6 +367,11 @@ void CMenus::ClearCustomItems(int CurTab)
 		// reload current DDNet particles skin
 		GameClient()->LoadExtrasSkin(g_Config.m_ClAssetExtras);
 	}
+	else if(CurTab == ASSETS_TAB_CONSOLE)
+	{
+		ClearAssetList(m_vConsoleList, Graphics());
+		GameClient()->LoadExtrasSkin(g_Config.m_ClAssetConsole);
+	}
 	gs_aInitCustomList[CurTab] = true;
 }
 
@@ -359,7 +424,8 @@ void CMenus::RenderSettingsCustom(CUIRect MainView)
 		Localize("Emoticons"),
 		Localize("Particles"),
 		Localize("HUD"),
-		Localize("Extras")};
+		Localize("Extras"),
+		Localize("Console")};
 
 	for(int Tab = ASSETS_TAB_ENTITIES; Tab < NUMBER_OF_ASSETS_TABS; ++Tab)
 	{

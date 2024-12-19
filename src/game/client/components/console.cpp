@@ -1058,7 +1058,6 @@ void CGameConsole::OnRender()
 	const ColorRGBA aBorderColors[NUM_CONSOLETYPES] = {ColorRGBA(0.1f, 0.1f, 0.1f, 0.9f), ColorRGBA(0.2f, 0.1f, 0.1f, 0.9f)};
 
 	Ui()->MapScreen();
-
 	// background
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_BACKGROUND_NOISE].m_Id);
 	Graphics()->QuadsBegin();

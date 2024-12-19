@@ -38,6 +38,18 @@ struct CServerProcess
 #endif
 };
 
+struct SFoldableSection
+{
+	bool m_Opened = false;
+	int m_Height = 0;
+};
+
+struct IBindListNode;
+struct SBindGroup;
+struct SBindKey;
+class CBindsV2;
+class CScrollRegion;
+
 // component to fetch keypresses, override all other input
 class CMenusKeyBinder : public CComponent
 {
@@ -83,7 +95,10 @@ class CMenus : public CComponent
 	int DoButton_CheckBoxAutoVMarginAndSet(const void *pId, const char *pText, int *pValue, CUIRect *pRect, float VMargin);
 	int DoButton_CheckBox_Number(const void *pId, const char *pText, int Checked, const CUIRect *pRect);
 
-	ColorHSLA DoLine_ColorPicker(CButtonContainer *pResetId, float LineSize, float LabelSize, float BottomMargin, CUIRect *pMainRect, const char *pText, unsigned int *pColorValue, ColorRGBA DefaultColor, bool CheckBoxSpacing = true, int *pCheckBoxValue = nullptr, bool Alpha = false);
+	int DoButton_FoldableSection(SFoldableSection *pSection, const char *pText, float FontSize, const CUIRect *pRect, float CornerRounding = 0.f);
+	int DoFoldableSection(SFoldableSection *pSection, const char *pText, float FontSize, CUIRect *pRect, CUIRect *pRectAfter, float CornerRounding, const std::function<int()> &fnRender);
+
+	ColorHSLA DoLine_ColorPicker(CButtonContainer *pResetID, float LineSize, float LabelSize, float BottomMargin, CUIRect *pMainRect, const char *pText, unsigned int *pColorValue, ColorRGBA DefaultColor, bool CheckBoxSpacing = true, int *pCheckBoxValue = nullptr, bool Alpha = false);
 	ColorHSLA DoButton_ColorPicker(const CUIRect *pRect, unsigned int *pHslaColor, bool Alpha);
 	void DoLaserPreview(const CUIRect *pRect, ColorHSLA OutlineColor, ColorHSLA InnerColor, const int LaserType);
 	int DoButton_GridHeader(const void *pId, const char *pText, int Checked, const CUIRect *pRect);
@@ -615,6 +630,8 @@ protected:
 	void RenderSettingsSound(CUIRect MainView);
 	void RenderSettings(CUIRect MainView);
 	void RenderSettingsCustom(CUIRect MainView);
+	//xc
+	void RenderSettingsXc(CUIRect MainView);
 
 	class CMapListItem
 	{
@@ -659,14 +676,23 @@ public:
 	static CMenusKeyBinder m_Binder;
 
 	CMenus();
-	virtual int Sizeof() const override { return sizeof(*this); }
+	virtual int Sizeof() const override
+	{
+		return sizeof(*this);
+	}
 
 	void RenderLoading(const char *pCaption, const char *pContent, int IncreaseCounter);
 	void FinishLoading();
 
-	bool IsInit() { return m_IsInit; }
+	bool IsInit()
+	{
+		return m_IsInit;
+	}
 
-	bool IsActive() const { return m_MenuActive; }
+	bool IsActive() const
+	{
+		return m_MenuActive;
+	}
 	void SetActive(bool Active);
 
 	void RunServer();
@@ -758,7 +784,10 @@ public:
 	void DemoSeekTick(IDemoPlayer::ETickOffset TickOffset);
 	bool m_Dummy;
 
-	const char *GetCurrentDemoFolder() const { return m_aCurrentDemoFolder; }
+	const char *GetCurrentDemoFolder() const
+	{
+		return m_aCurrentDemoFolder;
+	}
 
 	// Ghost
 	struct CGhostItem
@@ -835,6 +864,7 @@ private:
 	static int GhostlistFetchCallback(const CFsFileInfo *pInfo, int IsDir, int StorageType, void *pUser);
 	void SetMenuPage(int NewPage);
 	void RefreshBrowserTab(bool Force);
+
 
 	// found in menus_ingame.cpp
 	void RenderInGameNetwork(CUIRect MainView);

@@ -466,10 +466,56 @@ int CMenus::DoButton_CheckBox_Number(const void *pId, const char *pText, int Che
 	return DoButton_CheckBox_Common(pId, pText, aBuf, pRect);
 }
 
+int CMenus::DoButton_FoldableSection(SFoldableSection *pSection, const char *pText, float FontSize, const CUIRect *pRect, float CornerRounding)
+{
+	CUIRect Box, Label;
+	pRect->VSplitLeft(pRect->h, &Box, &Label);
+	Label.VSplitLeft(5.0f, nullptr, &Label);
+
+	int Checked = (int)pSection->m_Opened;
+	pRect->Draw(ColorRGBA(1, 1, 1, (Checked ? 0.4f : 0.25f) * Ui()->ButtonColorMul(pSection)), !Checked ? IGraphics::CORNER_ALL : IGraphics::CORNER_TL | IGraphics::CORNER_TR, CornerRounding);
+
+	TextRender()->SetRenderFlags(ETextRenderFlags::TEXT_RENDER_FLAG_ONLY_ADVANCE_WIDTH | ETextRenderFlags::TEXT_RENDER_FLAG_NO_X_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_Y_BEARING | ETextRenderFlags::TEXT_RENDER_FLAG_NO_OVERSIZE | ETextRenderFlags::TEXT_RENDER_FLAG_NO_PIXEL_ALIGMENT);
+	TextRender()->SetFontPreset(EFontPreset::ICON_FONT);
+	Ui()->DoLabel(&Box, Checked ? FONT_ICON_CIRCLE_CHEVRON_DOWN : FONT_ICON_CIRCLE_CHEVRON_RIGHT, FontSize, TEXTALIGN_MC);
+	TextRender()->SetFontPreset(EFontPreset::DEFAULT_FONT);
+
+	TextRender()->SetRenderFlags(0);
+	Ui()->DoLabel(&Label, pText, FontSize, TEXTALIGN_ML);
+
+	if(Ui()->DoButtonLogic(pSection, 0, pRect))
+		pSection->m_Opened = !pSection->m_Opened;
+
+	return pSection->m_Opened;
+}
+
+int CMenus::DoFoldableSection(SFoldableSection *pSection, const char *pText, float FontSize, CUIRect *pRect, CUIRect *pRectAfter, float CornerRounding, const std::function<int()> &fnRender)
+{
+	const float Margin = 10.0f;
+	const float HeaderHeight = FontSize + 5.0f + Margin;
+
+	CUIRect Button;
+
+	pRect->HSplitTop(HeaderHeight, &Button, pRect);
+	pRect->HSplitTop(pSection->m_Height, pRect, pRectAfter);
+
+	if(DoButton_FoldableSection(pSection, pText, FontSize, &Button, CornerRounding))
+	{
+		if(pSection->m_Height > 0)
+			pRect->Draw(ColorRGBA(1, 1, 1, 0.25f), IGraphics::CORNER_BL | IGraphics::CORNER_BR, CornerRounding);
+		pSection->m_Height = fnRender();
+	}
+	else
+		pSection->m_Height = 0;
+
+	return HeaderHeight + pSection->m_Height;
+}
+
 int CMenus::DoKeyReader(const void *pId, const CUIRect *pRect, int Key, int ModifierCombination, int *pNewModifierCombination)
 {
 	int NewKey = Key;
 	*pNewModifierCombination = ModifierCombination;
+
 
 	const int ButtonResult = Ui()->DoButtonLogic(pId, 0, pRect);
 	if(ButtonResult == 1)
@@ -484,7 +530,7 @@ int CMenus::DoKeyReader(const void *pId, const CUIRect *pRect, int Key, int Modi
 		*pNewModifierCombination = CBinds::MODIFIER_NONE;
 	}
 
-	if(m_Binder.m_pKeyReaderId == pId && m_Binder.m_GotKey)
+	if(m_Binder.m_pKeyReaderId == pid && m_Binder.m_GotKey)
 	{
 		// abort with escape key
 		if(m_Binder.m_Key.m_Key != KEY_ESCAPE)
@@ -498,7 +544,7 @@ int CMenus::DoKeyReader(const void *pId, const CUIRect *pRect, int Key, int Modi
 	}
 
 	char aBuf[64];
-	if(m_Binder.m_pKeyReaderId == pId && m_Binder.m_TakeKey)
+	if(m_Binder.m_pKeyReaderId == pid && m_Binder.m_TakeKey)
 		str_copy(aBuf, Localize("Press a key…"));
 	else if(NewKey == 0)
 		aBuf[0] = '\0';
@@ -509,7 +555,7 @@ int CMenus::DoKeyReader(const void *pId, const CUIRect *pRect, int Key, int Modi
 		str_format(aBuf, sizeof(aBuf), "%s%s", aModifiers, Input()->KeyName(NewKey));
 	}
 
-	const ColorRGBA Color = m_Binder.m_pKeyReaderId == pId && m_Binder.m_TakeKey ? ColorRGBA(0.0f, 1.0f, 0.0f, 0.4f) : ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * Ui()->ButtonColorMul(pId));
+	const ColorRGBA Color = m_Binder.m_pKeyReaderId == pid && m_Binder.m_TakeKey ? ColorRGBA(0.0f, 1.0f, 0.0f, 0.4f) : ColorRGBA(1.0f, 1.0f, 1.0f, 0.5f * Ui()->ButtonColorMul(pId));
 	pRect->Draw(Color, IGraphics::CORNER_ALL, 5.0f);
 	CUIRect Temp;
 	pRect->HMargin(1.0f, &Temp);
@@ -2148,6 +2194,14 @@ void CMenus::SetActive(bool Active)
 	{
 		Ui()->SetHotItem(nullptr);
 		Ui()->SetActiveItem(nullptr);
+
+		if(Client()->State() == IClient::STATE_ONLINE)
+		{
+			if(!Active)
+				m_pClient->m_BindsManager.SetActiveBindGroup(CBindsManager::GROUP_INGAME);
+			else
+				m_pClient->m_BindsManager.SetActiveBindGroup(CBindsManager::GROUP_MENUS);
+		}
 	}
 	m_MenuActive = Active;
 	if(!m_MenuActive)
@@ -2202,8 +2256,7 @@ bool CMenus::OnInput(const IInput::CEvent &Event)
 	// Escape key is always handled to activate/deactivate menu
 	if((Event.m_Flags & IInput::FLAG_PRESS && Event.m_Key == KEY_ESCAPE) || IsActive())
 	{
-		Ui()->OnInput(Event);
-		return true;
+		return Ui()->OnInput(Event) || (Event.m_Key >= KEY_MOUSE_1 && Event.m_Key <= KEY_MOUSE_WHEEL_RIGHT);
 	}
 	return false;
 }

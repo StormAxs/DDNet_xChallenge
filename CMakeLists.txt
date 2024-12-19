@@ -2378,6 +2378,7 @@ if(CLIENT)
     components/menus_settings7.cpp
     components/menus_settings_assets.cpp
     components/menus_start.cpp
+    components/menus_xc.cpp
     components/motd.cpp
     components/motd.h
     components/nameplates.cpp

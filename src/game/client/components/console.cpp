@@ -1138,7 +1138,20 @@ void CGameConsole::OnRender()
 		// bottom border
 	Graphics()->TextureClear();
 	Graphics()->QuadsBegin();
-	Graphics()->SetColor(aBorderColors[m_ConsoleType]);
+	if(g_Config.m_XcCustomConIcons)
+		if(CONSOLETYPE_LOCAL == m_ConsoleType)
+			Graphics()->SetColor(0);
+		else if(CONSOLETYPE_REMOTE == m_ConsoleType)
+			Graphics()->SetColor(0);
+	if(g_Config.m_XcCustomConsole)
+	{
+		if(CONSOLETYPE_LOCAL == m_ConsoleType)
+			Graphics()->SetColor(WcLocalConsoleColor);
+		else if(CONSOLETYPE_REMOTE == m_ConsoleType)
+			Graphics()->SetColor(WcRemoteConsoleColor);
+	}
+	else
+		Graphics()->SetColor(aBorderColors[m_ConsoleType]);
 	IGraphics::CQuadItem QuadItemBorder(0.0f, ConsoleHeight, Screen.w, 1.0f);
 	Graphics()->QuadsDrawTL(&QuadItemBorder, 1);
 	Graphics()->QuadsEnd();

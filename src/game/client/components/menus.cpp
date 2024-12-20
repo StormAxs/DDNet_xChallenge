@@ -2194,14 +2194,6 @@ void CMenus::SetActive(bool Active)
 	{
 		Ui()->SetHotItem(nullptr);
 		Ui()->SetActiveItem(nullptr);
-
-		if(Client()->State() == IClient::STATE_ONLINE)
-		{
-			if(!Active)
-				m_pClient->m_BindsManager.SetActiveBindGroup(CBindsManager::GROUP_INGAME);
-			else
-				m_pClient->m_BindsManager.SetActiveBindGroup(CBindsManager::GROUP_MENUS);
-		}
 	}
 	m_MenuActive = Active;
 	if(!m_MenuActive)

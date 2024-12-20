@@ -992,7 +992,7 @@ else()
 endif()
 
 ########################################################################
-# DATA
+  # DATA
 ########################################################################
 
 set(EXPECTED_DATA
@@ -1851,13 +1851,30 @@ set(EXPECTED_DATA
 
 set_glob(DATA GLOB_RECURSE "cfg;frag;json;map;otf;png;rules;ttc;ttf;txt;vert;wv" data ${EXPECTED_DATA})
 
-########################################################################
+set(EXPECTED_XC_DATA
+        console_wallpapers/console_bg.png
+        console_wallpapers/console_template.png
+        # Add more expected files here
+)
+
+set_glob(XC_DATA GLOB_RECURSE "cfg;frag;json;map;otf;png;rules;ttc;ttf;txt;vert;wv" xc_data ${EXPECTED_XC_DATA})
+
+#######################################################################
 # COPY DATA AND SHARED LIBS
 ########################################################################
 
+# Copy data from the existing data directory
 foreach(datafile ${DATA})
   file(RELATIVE_PATH OUT ${PROJECT_SOURCE_DIR}/data ${datafile})
   get_filename_component(DESTINATION data/${OUT} PATH)
+  file(MAKE_DIRECTORY ${DESTINATION})
+  file(COPY ${datafile} DESTINATION ${DESTINATION})
+endforeach()
+
+# Copy data from the xd_data directory
+foreach(datafile ${XC_DATA})
+  file(RELATIVE_PATH OUT ${PROJECT_SOURCE_DIR}/xc_data ${datafile})
+  get_filename_component(DESTINATION xd_data/${OUT} PATH)
   file(MAKE_DIRECTORY ${DESTINATION})
   file(COPY ${datafile} DESTINATION ${DESTINATION})
 endforeach()
@@ -2061,6 +2078,7 @@ set_src(ENGINE_SHARED GLOB_RECURSE src/engine/shared
   config.cpp
   config.h
   config_variables.h
+  config_variables_xc.h
   console.cpp
   console.h
   csv.cpp
@@ -3196,6 +3214,7 @@ set(CPACK_SOURCE_FILES
   README.md
   cmake/
   data/
+  xc_data/
   datasrc/
   ddnet-libs/
   license.txt

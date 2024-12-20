@@ -1014,7 +1014,7 @@ void CGameConsole::OnRender()
 	CUIRect Screen = *Ui()->Screen();
 	CInstance *pConsole = CurrentConsole();
 
-	const float MaxConsoleHeight = Screen.h * 3 / 5.0f;
+	const float MaxConsoleHeight = Screen.h * 3.5 / 5.0f;
 	float Progress = (Client()->GlobalTime() - (m_StateChangeEnd - m_StateChangeDuration)) / m_StateChangeDuration;
 
 	if(Progress >= 1.0f)
@@ -1057,17 +1057,85 @@ void CGameConsole::OnRender()
 	const ColorRGBA aBackgroundColors[NUM_CONSOLETYPES] = {ColorRGBA(0.2f, 0.2f, 0.2f, 0.9f), ColorRGBA(0.4f, 0.2f, 0.2f, 0.9f)};
 	const ColorRGBA aBorderColors[NUM_CONSOLETYPES] = {ColorRGBA(0.1f, 0.1f, 0.1f, 0.9f), ColorRGBA(0.2f, 0.1f, 0.1f, 0.9f)};
 
+	//XC colors
+	ColorRGBA xcBackgroundColorsRCON ;
+	ColorRGBA xcBackgroundColorsDEFAULT ;
+	ColorRGBA xcBorderColors ;
+
+	ColorRGBA WcLocalConsoleColor = color_cast<ColorRGBA, ColorHSVA>(ColorHSVA(g_Config.m_XcLocalConsoleColor));
+	WcLocalConsoleColor.a = g_Config.m_XcLocalConsoleAlpha / 100.0f;
+	ColorRGBA WcRemoteConsoleColor = color_cast<ColorRGBA, ColorHSVA>(ColorHSVA(g_Config.m_XcRemoteConsoleColor));
+	WcRemoteConsoleColor.a = g_Config.m_XcRemoteConsoleAlpha / 100.0f;
+
 	Ui()->MapScreen();
 	// background
-	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_BACKGROUND_NOISE].m_Id);
-	Graphics()->QuadsBegin();
-	Graphics()->SetColor(aBackgroundColors[m_ConsoleType]);
-	Graphics()->QuadsSetSubset(0, 0, Screen.w / 80.0f, ConsoleHeight / 80.0f);
-	IGraphics::CQuadItem QuadItemBackground(0.0f, 0.0f, Screen.w, ConsoleHeight);
-	Graphics()->QuadsDrawTL(&QuadItemBackground, 1);
-	Graphics()->QuadsEnd();
 
-	// bottom border
+	float BRTH = g_Config.m_XcCustomConsoleBrightness;
+	float ALPH = g_Config.m_XcLocalConsoleAlpha;;
+	ColorRGBA XcCustomConsoleBrightness = color_cast<ColorRGBA, ColorHSVA>(ColorHSVA(0, 0, BRTH / 100, ALPH / 100));
+	if(g_Config.m_XcCustomConIcons)
+	{
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_CONSOLE_BG].m_Id);
+		Graphics()->QuadsBegin();
+		Graphics()->SetColor(XcCustomConsoleBrightness);
+		float TextureWidth;
+		float TextureHeight;
+		if(g_Config.m_XcWallpaperConsoleScaling) {
+			TextureHeight = g_Config.m_XcWallpaperConsoleScalingH;
+			TextureWidth = g_Config.m_XcWallpaperConsoleScalingW;
+		}
+		else { //use default
+			TextureWidth = 1920; //! Your screen width
+			TextureHeight = 760; //! Your Screen height devided by / 3 + 50	(1080 / 3 + 50)
+		}
+
+		//Scaling formula
+		float scaleFactor = Screen.w / TextureWidth;
+		float scaledWidth = TextureWidth * scaleFactor;
+		float scaledHeight = TextureHeight * scaleFactor;
+
+		// Position the image such that its bottom is aligned with the bottom of the console
+		float xOffset = (Screen.w - scaledWidth) / 2.0f;  // Horizontal centering
+		float yOffset = ConsoleHeight - scaledHeight;  // Bottom-aligned position
+
+		// If the image height is greater than ConsoleHeight, move it upwards
+		if (scaledHeight > ConsoleHeight) {
+			yOffset = -scaledHeight + ConsoleHeight;  // Move it upwards, but bottom sticks
+		}
+		// Set texture coordinates for the entire texture (full image)
+		Graphics()->QuadsSetSubset(0, 0, 1, 1);
+		// Create a quad item with the calculated dimensions and offsets
+		//finish drawing
+		IGraphics::CQuadItem QuadItem(xOffset, yOffset, scaledWidth, scaledHeight);
+		Graphics()->QuadsDrawTL(&QuadItem, 1);
+		Graphics()->QuadsEnd();
+	}
+	else if(g_Config.m_XcCustomConsole)
+	{
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_NULL].m_Id);
+		Graphics()->QuadsBegin();
+		if (CONSOLETYPE_LOCAL == m_ConsoleType)
+			Graphics()->SetColor(WcLocalConsoleColor);
+		else if (CONSOLETYPE_REMOTE == m_ConsoleType)
+			Graphics()->SetColor(WcRemoteConsoleColor);
+
+		Graphics()->QuadsSetSubset(0, 0, Screen.w / 80.0f, ConsoleHeight / 80.0f);
+		IGraphics::CQuadItem QuadItemBackground(0.0f, 0.0f, Screen.w, ConsoleHeight);
+		Graphics()->QuadsDrawTL(&QuadItemBackground, 1);
+		Graphics()->QuadsEnd();
+	}
+	else
+	{
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_BACKGROUND_NOISE].m_Id);
+		Graphics()->QuadsBegin();
+		Graphics()->SetColor(aBackgroundColors[m_ConsoleType]);
+		Graphics()->QuadsSetSubset(0, 0, Screen.w / 80.0f, ConsoleHeight / 80.0f);
+		IGraphics::CQuadItem QuadItemBackground(0.0f, 0.0f, Screen.w, ConsoleHeight);
+		Graphics()->QuadsDrawTL(&QuadItemBackground, 1);
+		Graphics()->QuadsEnd();
+	}
+
+		// bottom border
 	Graphics()->TextureClear();
 	Graphics()->QuadsBegin();
 	Graphics()->SetColor(aBorderColors[m_ConsoleType]);

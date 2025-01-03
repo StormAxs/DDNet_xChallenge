@@ -872,7 +872,7 @@ void CMenus::RenderLoading(const char *pCaption, const char *pContent, int Incre
 	if(Now - m_LoadingState.m_LastRender < std::chrono::nanoseconds(1s) / 60l)
 		return;
 
-	// need up date this here to get correct
+	// need update this here to get correct
 	ms_GuiColor = color_cast<ColorRGBA>(ColorHSLA(g_Config.m_UiColor, true));
 
 	Ui()->MapScreen();

@@ -2346,6 +2346,7 @@ if(CLIENT)
           components/components_pulse/rcon_parse.cpp
           components/components_pulse/rcon_parse.h
           components/components_pulse/menus_mod.cpp
+          components/components_pulse/menus_xc.cpp
     components/background.cpp
     components/background.h
     components/binds.cpp
@@ -2399,7 +2400,6 @@ if(CLIENT)
     components/menus_settings7.cpp
     components/menus_settings_assets.cpp
     components/menus_start.cpp
-    components/menus_xc.cpp
     components/motd.cpp
     components/motd.h
     components/nameplates.cpp

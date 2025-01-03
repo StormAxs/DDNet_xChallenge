@@ -1,3 +1,5 @@
+/* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
+/* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/log.h>
 #include <base/math.h>
 #include <base/system.h>
@@ -14,21 +16,17 @@
 #include <game/generated/protocol.h>
 
 #include <game/client/animstate.h>
-#include <game/client/components/chat.h>
-#include <game/client/components/menu_background.h>
 #include <game/client/components/sounds.h>
 #include <game/client/gameclient.h>
 #include <game/client/render.h>
 #include <game/client/skin.h>
 #include <game/client/ui.h>
-#include <game/client/ui_listbox.h>
 #include <game/client/ui_scrollregion.h>
 #include <game/localization.h>
 
-#include "binds.h"
-#include "countryflags.h"
-#include "menus.h"
-#include "skins.h"
+#include "../binds.h"
+#include "../menus.h"
+#include "../skins.h"
 
 #include <array>
 #include <chrono>
@@ -36,6 +34,7 @@
 #include <numeric>
 #include <string>
 #include <vector>
+
 
 void CMenus::RenderSettingsXc(CUIRect MainView)
 {
@@ -68,7 +67,7 @@ void CMenus::RenderSettingsXc(CUIRect MainView)
 	ColorRGBA Rainbow = color_cast<ColorRGBA>(ColorHSVA(round_to_int(LocalTime() * 50) % 255 / 255.f, 1.f, 1.f));
 	ColorRGBA Default = ColorRGBA(1.f, 1.f, 1.f, 1.f);
 
-	CUIRect GeneralGroup, ConsoleGroup, VisualGroup;
+	CUIRect GeneralGroup, ConsoleGroup, VisualGroup, ScoreboardGroup;
 	MainView.y -= 10.0f;
 
 	// General Settings Section
@@ -175,6 +174,56 @@ void CMenus::RenderSettingsXc(CUIRect MainView)
 	    return TotalHeight;
 	});
 	s_ScrollRegion.AddRect(ConsoleGroup);
+
+	// General Settings Section
+	static SFoldableSection s_InScoreboardGroup;
+
+	MainView.HSplitTop(Margin, nullptr, &ScoreboardGroup);
+	DoFoldableSection(&s_InScoreboardGroup, Localize("Scoreboard"), FontSize, &ScoreboardGroup, &MainView, 5.0f, [&]() -> int {
+	    ScoreboardGroup.VMargin(Margin, &ScoreboardGroup);
+	    ScoreboardGroup.HMargin(Margin, &ScoreboardGroup);
+		int TotalHeightScoreboard = 90.0f; // Section height
+
+
+		 static SFoldableSection s_InScoreboardGroup_Toggles;
+		CUIRect ScoreboardGroup_Toggles;
+		ScoreboardGroup.HSplitTop(Margin, nullptr, &ScoreboardGroup_Toggles);
+		DoFoldableSection(&s_InScoreboardGroup_Toggles, Localize("PopUp Selector"), FontSize, &ScoreboardGroup_Toggles, &ScoreboardGroup, 5.0f, [&]() -> int {
+		int TotalHeightScoreboard_Toggles = 25.0f;
+			TotalHeightScoreboard += 35.0f;
+		ScoreboardGroup_Toggles.VMargin(Margin, &ScoreboardGroup_Toggles);
+		ScoreboardGroup_Toggles.HMargin(Margin, &ScoreboardGroup_Toggles);
+
+			CUIRect Button;
+			ScoreboardGroup_Toggles.HSplitTop(LineSize, &Button, &ScoreboardGroup_Toggles);
+	   		if (DoButton_CheckBox(&g_Config.m_XcScoreboardActionsProfile, Localize("Enable Profile Button In Scoreboard"), g_Config.m_XcScoreboardActionsProfile, &Button)) {
+	   			g_Config.m_XcScoreboardActionsProfile ^= 1;
+	   		}
+
+	   		ScoreboardGroup_Toggles.HSplitTop(LineSize, &Button, &ScoreboardGroup_Toggles);
+	   		if (DoButton_CheckBox(&g_Config.m_XcScoreboardActionsCopyName, Localize("Enable CopyName Button In Scoreboard"), g_Config.m_XcScoreboardActionsCopyName, &Button)) {
+	   			g_Config.m_XcScoreboardActionsCopyName ^= 1;
+	   		}
+
+			ScoreboardGroup_Toggles.HSplitTop(LineSize, &Button, &ScoreboardGroup_Toggles);
+			if (DoButton_CheckBox(&g_Config.m_XcScoreboardActionsVoteKick, Localize("Enable VoteKick Button In Scoreboard"), g_Config.m_XcScoreboardActionsVoteKick, &Button)) {
+		    		g_Config.m_XcScoreboardActionsVoteKick ^= 1;
+			}
+
+			ScoreboardGroup_Toggles.HSplitTop(LineSize, &Button, &ScoreboardGroup_Toggles);
+			if (DoButton_CheckBox(&g_Config.m_XcScoreboardActionsTeamActions, Localize("Enable Team Actions Button In Scoreboard"), g_Config.m_XcScoreboardActionsTeamActions, &Button)) {
+				g_Config.m_XcScoreboardActionsTeamActions ^= 1;
+			}
+
+
+			// Done with BulletTrails section
+	       return TotalHeightScoreboard_Toggles + Margin;
+	   });
+	   s_ScrollRegion.AddRect(ScoreboardGroup_Toggles);
+
+	    return TotalHeightScoreboard + Margin;
+	});
+	s_ScrollRegion.AddRect(ScoreboardGroup);
 
 static SFoldableSection s_InVisualGroup;
 CUIRect VisualGroup_Bullets, VisualGroup_Crosshair;

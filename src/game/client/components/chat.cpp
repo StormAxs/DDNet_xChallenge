@@ -454,6 +454,7 @@ bool CChat::OnInput(const IInput::CEvent &Event)
 	}
 	else
 	{
+		//TODO:Clickable links
 		// reset name completion process
 		if(Event.m_Flags & IInput::FLAG_PRESS && Event.m_Key != KEY_TAB && Event.m_Key != KEY_LSHIFT && Event.m_Key != KEY_RSHIFT)
 		{

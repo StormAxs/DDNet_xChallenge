@@ -49,3 +49,9 @@ MACRO_CONFIG_INT(XcShowTeeHitboxOther, xc_show_tee_hitbox_other, 0, 0, 1, CFGFLA
 MACRO_CONFIG_COL(XcShowHammerHitboxColor, xc_show_hammer_hitbox_color, 0xFFFFFF4D, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_COLALPHA, "Hammer hitbox color");
 MACRO_CONFIG_INT(XcShowHammerHitboxOwn, xc_show_hammer_hitbox_own, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show hitbox of hammer for local tee")
 MACRO_CONFIG_INT(XcShowHammerHitboxOther, xc_show_hammer_hitbox_others, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show hitbox of hammer for other tees")
+
+//Scoreboard
+MACRO_CONFIG_INT(XcScoreboardActionsProfile, xc_scoreboard_actions_profile, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Turn on the actions profiling")
+MACRO_CONFIG_INT(XcScoreboardActionsCopyName, xc_scoreboard_actions_copy_name, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Turn on the actions copy name")
+MACRO_CONFIG_INT(XcScoreboardActionsVoteKick, xc_scoreboard_actions_vote_kick, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Turn on the actions vote kick")
+MACRO_CONFIG_INT(XcScoreboardActionsTeamActions, xc_scoreboard_actions_team_actions, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Turn on the actions team actions")

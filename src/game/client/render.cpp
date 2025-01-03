@@ -268,6 +268,30 @@ void CRenderTools::GetRenderTeeOffsetToRenderedTee(const CAnimState *pAnim, cons
 	TeeOffsetToMid.y = -MidOfRendered;
 }
 
+void CRenderTools::RenderHammerHitbox(vec2 TeePos, vec2 Direction) const
+{
+	Graphics()->TextureClear();
+	Graphics()->QuadsBegin();
+	Graphics()->SetColor(color_cast<ColorRGBA>(ColorHSLA(g_Config.m_XcShowHammerHitboxColor, true)));
+	vec2 ProjStartPos = TeePos + Direction * 28.f * 0.75f;
+	Graphics()->DrawCircle(ProjStartPos.x, ProjStartPos.y, 14.f, 100);
+	Graphics()->QuadsEnd();
+}
+
+
+void CRenderTools::RenderTeeHitbox(vec2 Pos) const
+{
+	float Offset = 0.5f;
+
+	Graphics()->TextureClear();
+	Graphics()->QuadsBegin();
+	Graphics()->SetColor(color_cast<ColorRGBA>(ColorHSLA(g_Config.m_XcShowTeeHitboxOuterColor, true)));
+	Graphics()->DrawCircle(Pos.x + Offset, Pos.y + Offset, 28.f + Offset, 100);
+	Graphics()->SetColor(color_cast<ColorRGBA>(ColorHSLA(g_Config.m_XcShowTeeHitboxInnerColor, true)));
+	Graphics()->DrawCircle(Pos.x + Offset, Pos.y + Offset, 14.f + Offset, 100);
+	Graphics()->QuadsEnd();
+}
+
 void CRenderTools::RenderTee(const CAnimState *pAnim, const CTeeRenderInfo *pInfo, int Emote, vec2 Dir, vec2 Pos, float Alpha) const
 {
 	if(pInfo->m_aSixup[g_Config.m_ClDummy].m_aTextures[protocol7::SKINPART_BODY].IsValid())

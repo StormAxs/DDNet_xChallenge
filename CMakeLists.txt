@@ -2343,6 +2343,9 @@ if(CLIENT)
     animstate.h
     component.cpp
     component.h
+          components/components_pulse/rcon_parse.cpp
+          components/components_pulse/rcon_parse.h
+          components/components_pulse/menus_mod.cpp
     components/background.cpp
     components/background.h
     components/binds.cpp

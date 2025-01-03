@@ -30,4 +30,22 @@ MACRO_CONFIG_INT(XcSnowflakes, xc_snowflakes, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_
 //Console laod
 MACRO_CONFIG_STR(ClAssetConsole, xc_asset_console, 50, "console_bg", CFGFLAG_SAVE | CFGFLAG_CLIENT, "The asset for console")
 
+//aniclient
+// TODO: Remade
 
+MACRO_CONFIG_INT(XcShowHookCollOwnOverride, xc_show_hook_coll_own_override, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Override server's GAMEINFOFLAG_ALLOW_HOOK_COLL flag")
+
+MACRO_CONFIG_INT(XcApplySoloOnUnique, xc_apply_solo_unique, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Make client think everyone has solo modificator on unique servers")
+
+MACRO_CONFIG_INT(XcCursorSizeMultiplier, xc_cursor_size_multiplier, 10, 1, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Scale of weapon cursor (crosshair)")
+
+MACRO_CONFIG_INT(XcHideIgnoredInAnyCondition, xc_hide_ignored_any, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Hide ignored players even if they are onthe same team")
+
+MACRO_CONFIG_COL(XcShowTeeHitboxInnerColor, xc_show_tee_hitbox_inner_color, 0xFFB3FE4D, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_COLALPHA, "Own tee hitbox inner circle color");
+MACRO_CONFIG_COL(XcShowTeeHitboxOuterColor, xc_show_tee_hitbox_outer_color, 0xFEFFB34D, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_COLALPHA, "Own tee hitbox outer circle color");
+MACRO_CONFIG_INT(XcShowTeeHitboxOwn, xc_show_tee_hitbox_own, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show hitbox of local tee")
+MACRO_CONFIG_INT(XcShowTeeHitboxOther, xc_show_tee_hitbox_other, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show hitbox of other tees")
+
+MACRO_CONFIG_COL(XcShowHammerHitboxColor, xc_show_hammer_hitbox_color, 0xFFFFFF4D, CFGFLAG_CLIENT | CFGFLAG_SAVE | CFGFLAG_COLALPHA, "Hammer hitbox color");
+MACRO_CONFIG_INT(XcShowHammerHitboxOwn, xc_show_hammer_hitbox_own, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show hitbox of hammer for local tee")
+MACRO_CONFIG_INT(XcShowHammerHitboxOther, xc_show_hammer_hitbox_others, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show hitbox of hammer for other tees")

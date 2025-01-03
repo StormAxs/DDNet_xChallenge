@@ -2932,6 +2932,7 @@ void CClient::RegisterInterfaces()
 #endif
 	Kernel()->RegisterInterface(static_cast<IFriends *>(&m_Friends), false);
 	Kernel()->ReregisterInterface(static_cast<IFriends *>(&m_Foes));
+	Kernel()->ReregisterInterface(static_cast<IFriends *>(&m_Hidden));
 	Kernel()->RegisterInterface(static_cast<IHttp *>(&m_Http), false);
 }
 
@@ -2964,8 +2965,9 @@ void CClient::InitInterfaces()
 #endif
 
 	m_pConfigManager->RegisterCallback(IFavorites::ConfigSaveCallback, m_pFavorites);
-	m_Friends.Init();
-	m_Foes.Init(true);
+	m_Friends.Init(IFriends::FRIENDS);
+	m_Foes.Init(IFriends::FOES);
+	m_Hidden.Init(IFriends::HIDDEN);
 
 	m_GhostRecorder.Init();
 	m_GhostLoader.Init();
@@ -4460,6 +4462,9 @@ void CClient::RegisterCommands()
 static CClient *CreateClient()
 {
 	return new CClient;
+}
+void CClient::Con_DemoSlice(IConsole::IResult *pResult, void *pUserData)
+{
 }
 
 void CClient::HandleConnectAddress(const NETADDR *pAddr)

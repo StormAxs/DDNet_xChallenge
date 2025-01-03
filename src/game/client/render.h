@@ -228,6 +228,7 @@ public:
 
 	// returns the offset to use, to render the tee with @see RenderTee exactly in the mid
 	static void GetRenderTeeOffsetToRenderedTee(const CAnimState *pAnim, const CTeeRenderInfo *pInfo, vec2 &TeeOffsetToMid);
+
 	// object render methods
 	void RenderTee(const CAnimState *pAnim, const CTeeRenderInfo *pInfo, int Emote, vec2 Dir, vec2 Pos, float Alpha = 1.0f) const;
 
@@ -260,6 +261,11 @@ public:
 	void RenderSpeedupmap(CSpeedupTile *pSpeedup, int w, int h, float Scale, ColorRGBA Color, int RenderFlags) const;
 	void RenderSwitchmap(CSwitchTile *pSwitch, int w, int h, float Scale, ColorRGBA Color, int RenderFlags) const;
 	void RenderTunemap(CTuneTile *pTune, int w, int h, float Scale, ColorRGBA Color, int RenderFlags) const;
+
+	//Custom
+	void RenderHammerHitbox(vec2 TeePos, vec2 Direction) const;
+	void RenderTeeHitbox(vec2 Pos) const;
 };
+
 
 #endif

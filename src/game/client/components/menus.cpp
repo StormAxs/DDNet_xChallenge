@@ -155,6 +155,43 @@ int CMenus::DoButton_Menu(CButtonContainer *pButtonContainer, const char *pText,
 	return Ui()->DoButtonLogic(pButtonContainer, Checked, pRect);
 }
 
+int CMenus::DoButton_Menu_WRounding(CButtonContainer *pButtonContainer, const char *pText, int Checked, const CUIRect *pRect, const char *pImageName, int Corners, float Rounding, float FontFactor, ColorRGBA Color)
+{
+	CUIRect Text = *pRect;
+
+	if(Checked)
+		Color = ColorRGBA(0.6f, 0.6f, 0.6f, 0.5f);
+	Color.a *= Ui()->ButtonColorMul(pButtonContainer);
+
+	pRect->Draw(Color, Corners, Rounding);
+
+	if(pImageName)
+	{
+		CUIRect Image;
+		pRect->VSplitRight(pRect->h * 4.0f, &Text, &Image); // always correct ratio for image
+
+		// render image
+		const CMenuImage *pImage = FindMenuImage(pImageName);
+		if(pImage)
+		{
+			Graphics()->TextureSet(Ui()->HotItem() == pButtonContainer ? pImage->m_OrgTexture : pImage->m_GreyTexture);
+			Graphics()->WrapClamp();
+			Graphics()->QuadsBegin();
+			Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+			IGraphics::CQuadItem QuadItem(Image.x +4, Image.y + 4, Image.w - 8, Image.h - 8);
+			Graphics()->QuadsDrawTL(&QuadItem, 1);
+			Graphics()->QuadsEnd();
+			Graphics()->WrapNormal();
+		}
+	}
+
+	Text.HMargin(pRect->h >= 20.0f ? 2.0f : 1.0f, &Text);
+	Text.HMargin((Text.h * FontFactor) / 2.0f, &Text);
+	Ui()->DoLabel(&Text, pText, Text.h * CUi::ms_FontmodHeight, TEXTALIGN_MC);
+
+	return Ui()->DoButtonLogic(pButtonContainer, Checked, pRect);
+}
+
 int CMenus::DoButton_MenuTab(CButtonContainer *pButtonContainer, const char *pText, int Checked, const CUIRect *pRect, int Corners, SUIAnimator *pAnimator, const ColorRGBA *pDefaultColor, const ColorRGBA *pActiveColor, const ColorRGBA *pHoverColor, float EdgeRounding, const SCommunityIcon *pCommunityIcon)
 {
 	const bool MouseInside = Ui()->HotItem() == pButtonContainer;
@@ -783,13 +820,34 @@ void CMenus::RenderMenubar(CUIRect Box, IClient::EClientState ClientState)
 		}
 
 		Box.VSplitLeft(100.0f, &Button, &Box);
-		Box.VSplitLeft(4.0f, nullptr, &Box);
 		static CButtonContainer s_CallVoteButton;
-		if(DoButton_MenuTab(&s_CallVoteButton, Localize("Call vote"), ActivePage == PAGE_CALLVOTE, &Button, IGraphics::CORNER_TR))
+		if(Client()->RconAuthed())
 		{
-			NewPage = PAGE_CALLVOTE;
-			m_ControlPageOpening = true;
+			if(DoButton_MenuTab(&s_CallVoteButton, Localize("Call vote"), ActivePage == PAGE_CALLVOTE, &Button, IGraphics::CORNER_NONE))
+			{
+				NewPage = PAGE_CALLVOTE;
+				m_ControlPageOpening = true;
+			}
+			Box.VSplitLeft(70.0f, &Button, &Box);
+
+			static CButtonContainer s_ModMenuButton;
+			//TODO:BINDER
+			if(DoButton_MenuTab(&s_ModMenuButton, Localize("Mod"), ActivePage == PAGE_MOD, &Button, IGraphics::CORNER_TR))
+			{
+				NewPage = PAGE_MOD;
+			}
 		}
+		else
+		{
+			Box.VSplitLeft(4.0f, nullptr, &Box);
+			if(DoButton_MenuTab(&s_CallVoteButton, Localize("Call vote"), ActivePage == PAGE_CALLVOTE, &Button, IGraphics::CORNER_TR))
+			{
+				NewPage = PAGE_CALLVOTE;
+				m_ControlPageOpening = true;
+			}
+		}
+
+
 	}
 
 	if(NewPage != -1)
@@ -1233,6 +1291,10 @@ void CMenus::Render()
 			else if(m_GamePage == PAGE_CALLVOTE)
 			{
 				RenderServerControl(MainView);
+			}
+			else if(m_GamePage == PAGE_MOD)
+			{
+				RenderServerModMenu(MainView);
 			}
 			else if(m_GamePage == PAGE_SETTINGS)
 			{

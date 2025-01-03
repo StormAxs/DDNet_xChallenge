@@ -75,6 +75,7 @@
 #include "components/spectator.h"
 #include "components/statboard.h"
 #include "components/voting.h"
+#include "components/components_pulse/rcon_parse.h"
 #include "prediction/entities/character.h"
 #include "prediction/entities/projectile.h"
 
@@ -153,9 +154,10 @@ void CGameClient::OnConsoleInit()
 					      &m_Motd,
 					      &m_Menus,
 					      &m_Tooltips,
-					      &CMenus::m_Binder,
 					      &m_GameConsole,
-					      &m_MenuBackground});
+					      &m_GameConsoleParse,
+					      &m_MenuBackground
+	});
 
 	// build the input stack
 	m_vpInput.insert(m_vpInput.end(), {&CMenus::m_Binder, // this will take over all input when we want to bind a key

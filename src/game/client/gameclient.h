@@ -51,6 +51,7 @@
 #include "components/particles.h"
 #include "components/players.h"
 #include "components/race_demo.h"
+#include "components/components_pulse/rcon_parse.h"
 #include "components/scoreboard.h"
 #include "components/skins.h"
 #include "components/skins7.h"
@@ -150,6 +151,8 @@ public:
 	CTouchControls m_TouchControls;
 	CVoting m_Voting;
 	CSpectator m_Spectator;
+	//xc
+	CGameConsoleParse m_GameConsoleParse;
 
 	CPlayers m_Players;
 	CNamePlates m_NamePlates;
@@ -191,6 +194,7 @@ private:
 	class IEditor *m_pEditor;
 	class IFriends *m_pFriends;
 	class IFriends *m_pFoes;
+	class IFriends *m_pHidden;
 #if defined(CONF_AUTOUPDATE)
 	class IUpdater *m_pUpdater;
 #endif
@@ -268,6 +272,7 @@ public:
 	class IEditor *Editor() { return m_pEditor; }
 	class IFriends *Friends() { return m_pFriends; }
 	class IFriends *Foes() { return m_pFoes; }
+	class IFriends *Hidden() { return m_pHidden; }
 #if defined(CONF_AUTOUPDATE)
 	class IUpdater *Updater()
 	{
@@ -451,6 +456,7 @@ public:
 		bool m_EmoticonIgnore;
 		bool m_Friend;
 		bool m_Foe;
+		bool m_Hidden;
 
 		int m_AuthLevel;
 		bool m_Afk;

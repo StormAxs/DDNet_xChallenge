@@ -858,6 +858,7 @@ void CScoreboard::RenderPlayerPopUp()
 	RenderGeneralActions(&Base);
 	RenderTeamActions(&Base);
 	RenderModActions(&Base);
+
 }
 
 void CScoreboard::RenderQuickActions(CUIRect *pBase)
@@ -1091,19 +1092,31 @@ void CScoreboard::RenderTeamActions(CUIRect *pBase)
 
 void CScoreboard::RenderModActions(CUIRect *pBase)
 {
-	Console()->ExecuteLine("rcon show_ips 1");
-	Console()->ExecuteLine("rcon status");
 	static bool IsOpen = false;
-	if(!IsOpen){
-		m_pClient->m_GameConsoleParse.RconAuthenticated(true);
-		m_pClient->m_GameConsoleParse.Refresh();
+	static bool RconCommandsExecuted = false;
 
-		IsOpen = true;
+	if (Client()->RconAuthed())
+	{
+		if (!IsOpen)
+		{
+			m_pClient->m_GameConsoleParse.RconAuthenticated(true);
+			m_pClient->m_GameConsoleParse.Refresh();
+			IsOpen = true;
+			Console()->ExecuteLine("rcon show_ips 1");
+			Console()->ExecuteLine("rcon status");
+			RconCommandsExecuted = true;
+		}
+		if (!RconCommandsExecuted)
+		{
+			Console()->ExecuteLine("rcon show_ips 1");
+			Console()->ExecuteLine("rcon status");
+			RconCommandsExecuted = true;
+		}
+
 	}
 	//TODO: Somehow parsing info when tab is pressed??? //XD
 	//TODO: pop up a new window with custom ban
 	CUIRect Button;
-	bool IsMod = Client()->RconAuthed();
 
 	CGameClient::CClientData &Client = GameClient()->m_aClients[m_Popup.m_PlayerId];
 	ClientInfo pClient = m_pClient->m_GameConsoleParse.GetClientById(m_Popup.m_PlayerId);
@@ -1120,19 +1133,16 @@ void CScoreboard::RenderModActions(CUIRect *pBase)
 	else if(Community == 2)
 		str_format(aBanBuffer, sizeof(aBanBuffer), "!ban %s \"%s\" 1w Botting", pClient.addr, pPlayerName);
 
-	if(IsMod)
+	pBase->HSplitTop(SPopupProperties::ms_ItemSpacing, nullptr, pBase);
+	pBase->HSplitTop(SPopupProperties::ms_ButtonHeight, &Button, pBase);
+	Button.Draw(Hovered(&Button) ? SPopupProperties::TeamsActiveButtonColor() : SPopupProperties::ModActiveButtonColor(), IGraphics::CORNER_ALL, SPopupProperties::ms_Rounding);
+	Ui()->DoLabel(&Button, Localize("CopyBAN"), SPopupProperties::ms_FontSize, TEXTALIGN_MC);
+	if(DoButtonLogic(&Button))
 	{
-
-		pBase->HSplitTop(SPopupProperties::ms_ItemSpacing, nullptr, pBase);
-		pBase->HSplitTop(SPopupProperties::ms_ButtonHeight, &Button, pBase);
-		Button.Draw(Hovered(&Button) ? SPopupProperties::TeamsActiveButtonColor() : SPopupProperties::ModActiveButtonColor(), IGraphics::CORNER_ALL, SPopupProperties::ms_Rounding);
-		Ui()->DoLabel(&Button, Localize("CopyBAN"), SPopupProperties::ms_FontSize, TEXTALIGN_MC);
-		if(DoButtonLogic(&Button))
-		{
-			Input()->SetClipboardText(aBanBuffer);
-		}
+		Input()->SetClipboardText(aBanBuffer);
 	}
 }
+
 
 
 void CScoreboard::OnRender()

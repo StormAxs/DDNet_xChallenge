@@ -55,3 +55,9 @@ MACRO_CONFIG_INT(XcScoreboardActionsProfile, xc_scoreboard_actions_profile, 1, 0
 MACRO_CONFIG_INT(XcScoreboardActionsCopyName, xc_scoreboard_actions_copy_name, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Turn on the actions copy name")
 MACRO_CONFIG_INT(XcScoreboardActionsVoteKick, xc_scoreboard_actions_vote_kick, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Turn on the actions vote kick")
 MACRO_CONFIG_INT(XcScoreboardActionsTeamActions, xc_scoreboard_actions_team_actions, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Turn on the actions team actions")
+MACRO_CONFIG_INT(XcScoreboardFriedsSortPririty, xc_scoreboard_fries_priority, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Turn on frieds priority in scoreboard")
+
+//Scoreoard Colors
+MACRO_CONFIG_COL(XcScoreboardColorFriends, xc_scoreboard_color_friends, 7995321, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Blocked players color")
+MACRO_CONFIG_COL(XcScoreboardColorFoes, xc_scoreboard_color_foes, 65457, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Friends color")
+

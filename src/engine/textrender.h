@@ -152,6 +152,9 @@ MAYBE_UNUSED static const char *FONT_ICON_REDO = "\xEF\x8B\xB9";
 MAYBE_UNUSED static const char *FONT_ICON_ARROWS_ROTATE = "\xEF\x80\xA1";
 MAYBE_UNUSED static const char *FONT_ICON_QUESTION = "?";
 MAYBE_UNUSED static const char *FONT_ICON_CAMERA = "\xEF\x80\xB0";
+MAYBE_UNUSED static const char *FONT_ICON_SERVER = "\xEF\x82\xA0";
+MAYBE_UNUSED static const char *FONT_ICON_EXITGAME = "\xEF\x82\x8B";
+MAYBE_UNUSED static const char *FONT_ICON_PLAYXD = "\xf0\x9f\xab\xb6";
 } // end namespace FontIcons
 
 enum ETextCursorSelectionMode

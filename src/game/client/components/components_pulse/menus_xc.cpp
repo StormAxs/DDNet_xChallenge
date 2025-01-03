@@ -182,15 +182,25 @@ void CMenus::RenderSettingsXc(CUIRect MainView)
 	DoFoldableSection(&s_InScoreboardGroup, Localize("Scoreboard"), FontSize, &ScoreboardGroup, &MainView, 5.0f, [&]() -> int {
 	    ScoreboardGroup.VMargin(Margin, &ScoreboardGroup);
 	    ScoreboardGroup.HMargin(Margin, &ScoreboardGroup);
-		int TotalHeightScoreboard = 90.0f; // Section height
+		int TotalHeightScoreboard = 120.0f; // Section height
+		CUIRect Button;
 
+		int i = 0;
+		static CButtonContainer s_aResetIDs[24];
+		DoLine_ColorPicker(&s_aResetIDs[i++], ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing, &ScoreboardGroup, Localize("Friends color"), &g_Config.m_XcScoreboardColorFriends, ColorRGBA(0.451f, 1.0f, 0.918f), false);
+		DoLine_ColorPicker(&s_aResetIDs[i++], ColorPickerLineSize, ColorPickerLabelSize, ColorPickerLineSpacing, &ScoreboardGroup, Localize("Blocked color"), &g_Config.m_XcScoreboardColorFoes, ColorRGBA(1.0f, 0.388f, 0.388f), false);
+
+		ScoreboardGroup.HSplitTop(LineSize, &Button, &ScoreboardGroup);
+		if (DoButton_CheckBox(&g_Config.m_XcScoreboardFriedsSortPririty, Localize("Enable custom console speed"), g_Config.m_XcScoreboardFriedsSortPririty, &Button)) {
+			g_Config.m_XcScoreboardFriedsSortPririty ^= 1;
+		}
 
 		 static SFoldableSection s_InScoreboardGroup_Toggles;
 		CUIRect ScoreboardGroup_Toggles;
 		ScoreboardGroup.HSplitTop(Margin, nullptr, &ScoreboardGroup_Toggles);
 		DoFoldableSection(&s_InScoreboardGroup_Toggles, Localize("PopUp Selector"), FontSize, &ScoreboardGroup_Toggles, &ScoreboardGroup, 5.0f, [&]() -> int {
-		int TotalHeightScoreboard_Toggles = 25.0f;
-			TotalHeightScoreboard += 35.0f;
+		int TotalHeightScoreboard_Toggles = 90.0f;
+			TotalHeightScoreboard += 90.0f;
 		ScoreboardGroup_Toggles.VMargin(Margin, &ScoreboardGroup_Toggles);
 		ScoreboardGroup_Toggles.HMargin(Margin, &ScoreboardGroup_Toggles);
 
@@ -220,6 +230,8 @@ void CMenus::RenderSettingsXc(CUIRect MainView)
 	       return TotalHeightScoreboard_Toggles + Margin;
 	   });
 	   s_ScrollRegion.AddRect(ScoreboardGroup_Toggles);
+
+
 
 	    return TotalHeightScoreboard + Margin;
 	});

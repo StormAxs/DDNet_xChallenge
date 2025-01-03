@@ -1963,42 +1963,63 @@ void CGameClient::OnNewSnapshot()
 		m_aClients[i].m_Hidden = !(i == m_Snap.m_LocalClientId || !m_Snap.m_apPlayerInfos[i] || !Hidden()->IsFriend(m_aClients[i].m_aName, m_aClients[i].m_aClan, true));
 	}
 
-	// sort player infos by name
-	mem_copy(m_Snap.m_apInfoByName, m_Snap.m_apPlayerInfos, sizeof(m_Snap.m_apInfoByName));
-	std::stable_sort(m_Snap.m_apInfoByName, m_Snap.m_apInfoByName + MAX_CLIENTS,
-		[this](const CNetObj_PlayerInfo *p1, const CNetObj_PlayerInfo *p2) -> bool {
-			if(!p2)
-				return static_cast<bool>(p1);
-			if(!p1)
-				return false;
-			return str_comp_nocase(m_aClients[p1->m_ClientId].m_aName, m_aClients[p2->m_ClientId].m_aName) < 0;
-		});
 
-	bool TimeScore = m_GameInfo.m_TimeScore;
-	bool Race7 = Client()->IsSixup() && m_Snap.m_pGameInfoObj && m_Snap.m_pGameInfoObj->m_GameFlags & protocol7::GAMEFLAG_RACE;
+mem_copy(m_Snap.m_apInfoByName, m_Snap.m_apPlayerInfos, sizeof(m_Snap.m_apInfoByName));
+std::stable_sort(m_Snap.m_apInfoByName, m_Snap.m_apInfoByName + MAX_CLIENTS,
+    [this](const CNetObj_PlayerInfo *p1, const CNetObj_PlayerInfo *p2) -> bool {
+        if (!p1) return false;
+        if (!p2) return true;
 
-	// sort player infos by score
-	mem_copy(m_Snap.m_apInfoByScore, m_Snap.m_apInfoByName, sizeof(m_Snap.m_apInfoByScore));
-	if(Race7)
-		std::stable_sort(m_Snap.m_apInfoByScore, m_Snap.m_apInfoByScore + MAX_CLIENTS,
-			[](const CNetObj_PlayerInfo *p1, const CNetObj_PlayerInfo *p2) -> bool {
-				if(!p2)
-					return static_cast<bool>(p1);
-				if(!p1)
-					return false;
-				return (((p1->m_Score == -1) ? std::numeric_limits<int>::max() : p1->m_Score) <
-					((p2->m_Score == -1) ? std::numeric_limits<int>::max() : p2->m_Score));
-			});
-	else
-		std::stable_sort(m_Snap.m_apInfoByScore, m_Snap.m_apInfoByScore + MAX_CLIENTS,
-			[TimeScore](const CNetObj_PlayerInfo *p1, const CNetObj_PlayerInfo *p2) -> bool {
-				if(!p2)
-					return static_cast<bool>(p1);
-				if(!p1)
-					return false;
-				return (((TimeScore && p1->m_Score == -9999) ? std::numeric_limits<int>::min() : p1->m_Score) >
-					((TimeScore && p2->m_Score == -9999) ? std::numeric_limits<int>::min() : p2->m_Score));
-			});
+        bool p1IsFriend = m_aClients[p1->m_ClientId].m_Friend;
+        bool p2IsFriend = m_aClients[p2->m_ClientId].m_Friend;
+
+        if (p1IsFriend && !p2IsFriend) return true;
+        if (!p1IsFriend && p2IsFriend) return false;
+
+        return str_comp_nocase(m_aClients[p1->m_ClientId].m_aName, m_aClients[p2->m_ClientId].m_aName) < 0;
+    });
+
+// Sort player infos by score, with friends first
+	//TODO: friends score logic improve
+mem_copy(m_Snap.m_apInfoByScore, m_Snap.m_apInfoByName, sizeof(m_Snap.m_apInfoByScore));
+bool TimeScore = m_GameInfo.m_TimeScore;
+bool Race7 = Client()->IsSixup() && m_Snap.m_pGameInfoObj && m_Snap.m_pGameInfoObj->m_GameFlags & protocol7::GAMEFLAG_RACE;
+
+if (Race7) {
+    std::stable_sort(m_Snap.m_apInfoByScore, m_Snap.m_apInfoByScore + MAX_CLIENTS,
+        [this](const CNetObj_PlayerInfo *p1, const CNetObj_PlayerInfo *p2) -> bool {
+            if (!p1) return false;
+            if (!p2) return true;
+	if(g_Config.m_XcScoreboardFriedsSortPririty)
+	{
+		bool p1IsFriend = m_aClients[p1->m_ClientId].m_Friend;
+		bool p2IsFriend = m_aClients[p2->m_ClientId].m_Friend;
+
+		if (p1IsFriend && !p2IsFriend) return true;
+		if (!p1IsFriend && p2IsFriend) return false;
+	}
+            return (((p1->m_Score == -1) ? std::numeric_limits<int>::max() : p1->m_Score) <
+                    ((p2->m_Score == -1) ? std::numeric_limits<int>::max() : p2->m_Score));
+        });
+} else {
+    std::stable_sort(m_Snap.m_apInfoByScore, m_Snap.m_apInfoByScore + MAX_CLIENTS,
+        [TimeScore, this](const CNetObj_PlayerInfo *p1, const CNetObj_PlayerInfo *p2) -> bool {
+            if (!p1) return false;
+            if (!p2) return true;
+
+        	if(g_Config.m_XcScoreboardFriedsSortPririty)
+        	{
+        		bool p1IsFriend = m_aClients[p1->m_ClientId].m_Friend;
+			bool p2IsFriend = m_aClients[p2->m_ClientId].m_Friend;
+
+			if (p1IsFriend && !p2IsFriend) return true;
+			if (!p1IsFriend && p2IsFriend) return false;
+        	}
+
+            return (((TimeScore && p1->m_Score == -9999) ? std::numeric_limits<int>::min() : p1->m_Score) >
+                    ((TimeScore && p2->m_Score == -9999) ? std::numeric_limits<int>::min() : p2->m_Score));
+        });
+}
 
 	// sort player infos by DDRace Team (and score between)
 	int Index = 0;

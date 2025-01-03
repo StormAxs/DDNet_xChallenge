@@ -337,6 +337,16 @@ void CScoreboard::RenderSpectators(CUIRect Spectators)
 		{
 			TextRender()->TextColor(color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClAuthedPlayerColor)));
 		}
+		else if(GameClient()->m_aClients[pInfo->m_ClientId].m_Friend)
+		{
+			TextRender()->TextColor(color_cast<ColorRGBA>(ColorHSLA(g_Config.m_XcScoreboardColorFriends)));
+		}
+		else if(GameClient()->m_aClients[pInfo->m_ClientId].m_Foe)
+		{
+			TextRender()->TextColor(color_cast<ColorRGBA>(ColorHSLA(g_Config.m_XcScoreboardColorFoes)));
+		}
+
+
 
 		TextRender()->TextEx(&Cursor, GameClient()->m_aClients[pInfo->m_ClientId].m_aName);
 		TextRender()->TextColor(TextRender()->DefaultTextColor());
@@ -435,17 +445,19 @@ bool CScoreboard::RenderScoreboard(CUIRect Scoreboard, int Team, int CountStart,
 	const float ClanLength = CountryOffset - ClanOffset - 5.0f;
 
 	// render headlines
+
 	const float HeadlineFontsize = 22.0f;
 	CUIRect Headline;
 	Scoreboard.HSplitTop(HeadlineFontsize * 2.0f, &Headline, &Scoreboard);
 	const float HeadlineY = Headline.y + Headline.h / 2.0f - HeadlineFontsize / 2.0f;
-	const char *pScore = TimeScore ? Localize("Time") : Localize("Score");
+	const char *pScore = TimeScore ? Localize("T") : Localize("Score");
 	TextRender()->Text(ScoreOffset + ScoreLength - TextRender()->TextWidth(HeadlineFontsize, pScore), HeadlineY, HeadlineFontsize, pScore);
-	TextRender()->Text(NameOffset, HeadlineY, HeadlineFontsize, Localize("Name"));
-	const char *pClanLabel = Localize("Clan");
+	TextRender()->Text(NameOffset, HeadlineY, HeadlineFontsize, Localize("N"));
+	const char *pClanLabel = Localize("C");
 	TextRender()->Text(ClanOffset + (ClanLength - TextRender()->TextWidth(HeadlineFontsize, pClanLabel)) / 2.0f, HeadlineY, HeadlineFontsize, pClanLabel);
-	const char *pPingLabel = Localize("Ping");
+	const char *pPingLabel = Localize(FontIcons::FONT_ICON_SERVER);
 	TextRender()->Text(PingOffset + PingLength - TextRender()->TextWidth(HeadlineFontsize, pPingLabel), HeadlineY, HeadlineFontsize, pPingLabel);
+;
 
 	// render player entries
 	int CountRendered = 0;
@@ -655,12 +667,23 @@ bool CScoreboard::RenderScoreboard(CUIRect Scoreboard, int Team, int CountStart,
 				{
 					TextRender()->TextColor(color_cast<ColorRGBA>(ColorHSLA(g_Config.m_ClAuthedPlayerColor)));
 				}
+				else if(ClientData.m_Friend)
+				{
+					TextRender()->TextColor(color_cast<ColorRGBA>(ColorHSLA(g_Config.m_XcScoreboardColorFriends)));
+				}
+				else if(ClientData.m_Foe)
+				{
+					TextRender()->TextColor(color_cast<ColorRGBA>(ColorHSLA(g_Config.m_XcScoreboardColorFoes)));
+				}
+
 				if(g_Config.m_ClShowIds)
 				{
 					char aClientId[16];
 					GameClient()->FormatClientId(pInfo->m_ClientId, aClientId, EClientIdFormat::INDENT_AUTO);
 					TextRender()->TextEx(&Cursor, aClientId);
 				}
+
+
 				TextRender()->TextEx(&Cursor, ClientData.m_aName);
 
 				// ready / watching
@@ -857,7 +880,8 @@ void CScoreboard::RenderPlayerPopUp()
 	RenderQuickActions(&Base);
 	RenderGeneralActions(&Base);
 	RenderTeamActions(&Base);
-	RenderModActions(&Base);
+	if(Client()->RconAuthed())
+		RenderModActions(&Base);
 
 }
 
@@ -1133,6 +1157,7 @@ void CScoreboard::RenderModActions(CUIRect *pBase)
 	else if(Community == 2)
 		str_format(aBanBuffer, sizeof(aBanBuffer), "!ban %s \"%s\" 1w Botting", pClient.addr, pPlayerName);
 
+	//TODO: redirect to mod menus when mod actions is been pressed
 	pBase->HSplitTop(SPopupProperties::ms_ItemSpacing, nullptr, pBase);
 	pBase->HSplitTop(SPopupProperties::ms_ButtonHeight, &Button, pBase);
 	Button.Draw(Hovered(&Button) ? SPopupProperties::TeamsActiveButtonColor() : SPopupProperties::ModActiveButtonColor(), IGraphics::CORNER_ALL, SPopupProperties::ms_Rounding);
